@@ -9,44 +9,28 @@ exports.handler = async (event) => {
 
   const headers = { ...corsHeaders(), "Content-Type": "application/json" };
 
-  // GET - Fetch config
-  if (event.httpMethod === "GET") {
-    try {
+  try {
+    // GET - Fetch config
+    if (event.httpMethod === "GET") {
       const config = await readConfig();
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify(config),
       };
-    } catch (e) {
-      console.error("GET /api/config error:", e.message || e);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ success: false, message: "Failed to read config: " + (e.message || "Unknown error") }),
-      };
     }
-  }
 
-  // POST - Update config
-  if (event.httpMethod === "POST") {
-    try {
+    // POST - Update config
+    if (event.httpMethod === "POST") {
       const body = JSON.parse(event.body);
       const config = normalizeConfig(body);
 
       if (config && typeof config === "object" && config.prizes && Array.isArray(config.prizes)) {
-        const success = await writeConfig(config);
-        if (success) {
-          return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ success: true, message: "Configuration saved successfully!", data: config }),
-          };
-        }
+        await writeConfig(config);
         return {
-          statusCode: 500,
+          statusCode: 200,
           headers,
-          body: JSON.stringify({ success: false, message: "Failed to write configuration to store." }),
+          body: JSON.stringify({ success: true, message: "Configuration saved successfully!", data: config }),
         };
       }
 
@@ -55,19 +39,26 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({ success: false, message: "Invalid configuration format." }),
       };
-    } catch (e) {
-      console.error("POST /api/config error:", e.message || e);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ success: false, message: "Failed to save config: " + (e.message || "Unknown error") }),
-      };
     }
-  }
 
-  return {
-    statusCode: 405,
-    headers,
-    body: JSON.stringify({ message: "Method not allowed" }),
-  };
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ message: "Method not allowed" }),
+    };
+  } catch (e) {
+    console.error("config-handler error:", e);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: "Server error: " + (e.message || "Unknown"),
+        debug: {
+          hasBlobsContext: !!process.env.NETLIFY_BLOBS_CONTEXT,
+          nodeVersion: process.version,
+        },
+      }),
+    };
+  }
 };
