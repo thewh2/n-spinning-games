@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NChat - Spin & Win</title>
+    <link rel="stylesheet" href="main.css" type="text/css" />
+    <script type="text/javascript" src="Winwheel.min.js"></script>
+    <script src="TweenMax.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo-container">
+            <img src="nchat-logo.png" alt="NChat Logo" class="logo-img">
+        </div>
+        <!-- <h1>🎁 Special Rewards</h1>
+        <p>Spin for a chance to win delicious treats!</p> -->
+    </div>
+
+    <div class="game-container">
+        <!-- Wheel Canvas Section -->
+        <div class="the_wheel">
+            <div class="wheel-pointer"></div>
+            <div id="spin_button" class="wheel-center" onclick="startSpin();">
+                <div class="spin-text-center">CLICK ME<br>TO SPIN</div>
+            </div>
+            <canvas id="canvas" width="434" height="434">
+                <p style="color: white" align="center">Sorry, your browser doesn't support canvas. Please try another.
+                </p>
+            </canvas>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="power_controls">
+            <!-- <h3>Select Power</h3>
+            <div class="power-level">
+                <button class="power-btn" id="pw3" onclick="powerSelected(3);">High</button>
+                <button class="power-btn" id="pw2" onclick="powerSelected(2);">Med</button>
+                <button class="power-btn" id="pw1" onclick="powerSelected(1);">Low</button>
+            </div> -->
+
+
+            <div id="spin_display_container" class="spin-count-container">
+                <div id="spin_count_text" class="spin-count-text">Spins Left: 3</div>
+                <div id="refresh_message" class="refresh-msg">Spins Limit Reached</div>
+            </div>
+
+            <a href="#" class="reset-link" onclick="resetWheel(); return false;">Reset Wheel</a>
+        </div>
+    </div>
+
+    <!-- Hidden Ticket Element for Capture -->
+    <div id="winningTicket"
+        style="position: absolute; left: -9999px; background: white; padding: 40px; border: 4px solid #25D366; border-radius: 20px; text-align: center; font-family: sans-serif; width: 400px;">
+        <img src="nchat-logo.png" style="width: 100px; margin-bottom: 20px;">
+        <h1 style="color: #128C7E; margin: 0; font-size: 20px;">WINNER TICKET</h1>
+        <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+        <h2 id="ticketPrize" style="font-size: 32px; margin: 10px 0; color: #333;">Prize Name</h2>
+        <p style="color: #666; font-size: 14px;">Issued: <span id="ticketDate"></span></p>
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">Present this ticket at the desk.</p>
+    </div>
+
+    <!-- Modal for Result -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modalTitle">🎉 Adjusted Title 🎉</h2>
+            <p id="resultText">You have won a prize!</p>
+
+            <!-- <button id="saveBtn" class="modal-btn" onclick="saveTicket()" style="display: none; margin-bottom: 10px;">📸
+                Save Ticket</button> -->
+            <button id="claimBtn" class="modal-btn" onclick="claimReward()"
+                style="display: none; margin-bottom: 10px;">🎁 Claim Reward</button>
+            <button class="modal-btn" onclick="closeModal()" style="background-color: #555;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Audio Context for synthesizing sounds without external files
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTickSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // Visual Tick Animation
+            const pointer = document.querySelector('.wheel-pointer');
+            if (pointer) {
+                pointer.style.transform = 'translateX(-50%) rotate(-15deg)';
+                setTimeout(() => {
+                    pointer.style.transform = 'translateX(-50%) rotate(0deg)';
+                }, 50);
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime); // Low "tick"
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.05);
+
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // ---------------------------------------------------------
+        // DYNAMIC CONFIG LOGIC
+        // ---------------------------------------------------------
+        const CONFIG_KEY = '_nchat_wheel_config';
+        const DEFAULT_CONFIG = {
+            maxSpinsPerDay: 3,
+            prizes: [
+                { id: 1, name: "Wallet Ladies 👜", probability: 2, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 3, name: "Wallet Men 💼", probability: 2, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 5, name: "Pickle Ball 🎾", probability: 5, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 7, name: "Pen 🖊️", probability: 15, stock: 10, isPrize: true, enabled: true, winCount: 0 }
+            ]
+        };
+
+        function getWheelConfig() {
+            return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        }
+
+        let activeConfig = {};
+        let MAX_SPINS_PER_DAY = 3;
+        let theWheel;
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Handle both old array format and new object format
+                    if (Array.isArray(data)) {
+                        activeConfig = { maxSpinsPerDay: 3, prizes: data };
+                    } else {
+                        activeConfig = data;
+                    }
+                    MAX_SPINS_PER_DAY = activeConfig.maxSpinsPerDay || 3;
+                    return;
+                }
+            } catch(e) {
+                console.warn("API server not active, using defaults", e);
+            }
+
+            activeConfig = getWheelConfig();
+            MAX_SPINS_PER_DAY = activeConfig.maxSpinsPerDay || 3;
+        }
+
+        function buildSegments(config) {
+            const prizes = config.prizes || config;
+            const enabledPrizes = prizes.filter(item => item.enabled);
+            const prizeColors = ['#128C7E', '#25D366', '#34B7F1'];
+            const segments = [];
+
+            enabledPrizes.forEach((item, index) => {
+                const color = prizeColors[index % prizeColors.length];
+                const displayName = item.icon ? `${item.name} ${item.icon}` : item.name;
+                segments.push({
+                    'fillStyle': color,
+                    'text': displayName,
+                    'textFillStyle': '#ffffff',
+                    'isPrize': true,
+                    'id': item.id
+                });
+                segments.push({
+                    'fillStyle': '#ffffff',
+                    'text': 'Try Again',
+                    'textFillStyle': '#111b21',
+                    'isPrize': false
+                });
+            });
+
+            if (segments.length === 0) {
+                segments.push({ 'fillStyle': '#ffffff', 'text': 'Try Again', 'textFillStyle': '#111b21', 'isPrize': false });
+                segments.push({ 'fillStyle': '#ffffff', 'text': 'Try Again', 'textFillStyle': '#111b21', 'isPrize': false });
+            }
+
+            return segments;
+        }
+
+        async function initGame() {
+            await loadConfig();
+            const segments = buildSegments(activeConfig);
+
+            theWheel = new Winwheel({
+                'numSegments': segments.length,
+                'outerRadius': 212,
+                'innerRadius': 50,
+                'textFontSize': segments.length > 8 ? 14 : 18,
+                'textWeight': 'bold',
+                'textMargin': 0,
+                'segments': segments,
+                'lineWidth': 2,
+                'strokeStyle': '#ffffff',
+                'animation': {
+                    'type': 'spinToStop',
+                    'duration': 6,
+                    'spins': 8,
+                    'callbackFinished': alertPrize,
+                    'callbackSound': playTickSound,
+                    'soundTrigger': 'pin'
+                },
+                'pins': {
+                    'number': segments.length,
+                    'fillStyle': '#ffffff',
+                    'outerRadius': 5,
+                    'responsive': true,
+                    'strokeStyle': '#128C7E'
+                }
+            });
+
+            lastConfigChecksum = generateConfigChecksum(activeConfig);
+            try {
+                const versionRes = await fetch(`/api/config/version?t=${Date.now()}`);
+                if (versionRes.ok) {
+                    const versionData = await versionRes.json();
+                    lastConfigVersion = Number(versionData.version || 0);
+                }
+            } catch (e) {
+                // Ignore if API version endpoint is unavailable.
+            }
+
+            powerSelected(2);
+            updateSpinUI();
+        }
+
+        // Controls Logic
+        let wheelPower = 0;
+        let wheelSpinning = false;
+
+        function powerSelected(powerLevel) {
+            if (wheelSpinning == false) {
+                wheelPower = powerLevel;
+                const data = getSpinData();
+                if (data.count < MAX_SPINS_PER_DAY) {
+                    document.getElementById('spin_button').classList.remove('disabled');
+                    document.getElementById('spin_button').style.cursor = "pointer";
+                }
+            }
+        }
+
+        // ---------------------------------------------------------
+        // SPIN LIMIT LOGIC
+        // ---------------------------------------------------------
+        const SPIN_DATA_KEY = '_nchat_user_spin_data';
+
+        function getSpinData() {
+            let data = localStorage.getItem(SPIN_DATA_KEY);
+            const today = new Date().toDateString();
+
+            // Basic "Hard Security": check if data is tampered with
+            if (!data) {
+                return { count: 0, lastDate: today };
+            }
+
+            let parsedData;
+            try {
+                // De-obfuscate or just parse
+                parsedData = JSON.parse(atob(data)); // Using base64 as a simple obfuscation
+            } catch (e) {
+                // If parsing fails, it might be tampered, reset it
+                return { count: 0, lastDate: today };
+            }
+
+            if (typeof parsedData.count !== 'number' || isNaN(parsedData.count)) {
+                return { count: 0, lastDate: today };
+            }
+
+            // Reset if it's a new day
+            if (parsedData.lastDate !== today) {
+                return { count: 0, lastDate: today };
+            }
+
+            return parsedData;
+        }
+
+        function saveSpinData(count) {
+            const today = new Date().toDateString();
+            const data = { count: count, lastDate: today };
+            // Simple obfuscation to prevent easy manual editing
+            localStorage.setItem(SPIN_DATA_KEY, btoa(JSON.stringify(data)));
+            updateSpinUI();
+        }
+
+        function updateSpinUI() {
+            const data = getSpinData();
+            const remaining = Math.max(0, MAX_SPINS_PER_DAY - data.count);
+            const countText = document.getElementById('spin_count_text');
+            const refreshMsg = document.getElementById('refresh_message');
+            const spinBtn = document.getElementById('spin_button');
+
+            countText.innerText = `Spins Left: ${remaining}`;
+
+            if (remaining <= 0) {
+                refreshMsg.style.display = 'block';
+                countText.style.color = '#e74c3c';
+                spinBtn.classList.add('disabled');
+                spinBtn.style.cursor = 'not-allowed';
+            } else {
+                refreshMsg.style.display = 'none';
+                countText.style.color = '#128C7E';
+                spinBtn.classList.remove('disabled');
+                spinBtn.style.cursor = 'pointer';
+            }
+        }
+
+        // Initialize game asynchronously
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+            startConfigSyncProcess();
+        });
+
+        // ---------------------------------------------------------
+        // AUTO SYNC CONFIG FROM ADMIN CHANGES
+        // ---------------------------------------------------------
+        let lastConfigChecksum = null;
+        let lastConfigVersion = null;
+        let configSyncChannel = null;
+        let pendingConfigApply = null;
+
+        function generateConfigChecksum(config) {
+            // Full JSON string comparison avoids missed updates in probability/spin changes.
+            return JSON.stringify(config);
+        }
+
+        function normalizeConfig(data) {
+            return Array.isArray(data)
+                ? { maxSpinsPerDay: 3, prizes: data }
+                : data;
+        }
+
+        async function fetchConfigFromApi() {
+            const response = await fetch(`/api/config?t=${Date.now()}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch config from API');
+            }
+            const data = await response.json();
+            return normalizeConfig(data);
+        }
+
+        async function checkApiVersionAndSync() {
+            try {
+                const versionResponse = await fetch(`/api/config/version?t=${Date.now()}`);
+                if (!versionResponse.ok) {
+                    return;
+                }
+
+                const versionData = await versionResponse.json();
+                const serverVersion = Number(versionData.version || 0);
+
+                if (lastConfigVersion === null) {
+                    lastConfigVersion = serverVersion;
+                    return;
+                }
+
+                if (serverVersion !== lastConfigVersion) {
+                    lastConfigVersion = serverVersion;
+                    const newConfig = await fetchConfigFromApi();
+                    const newChecksum = generateConfigChecksum(newConfig);
+
+                    if (newChecksum !== lastConfigChecksum) {
+                        lastConfigChecksum = newChecksum;
+                        if (wheelSpinning) {
+                            pendingConfigApply = newConfig;
+                        } else {
+                            applyConfigUpdate(newConfig);
+                        }
+                    }
+                }
+            } catch (e) {
+                // Keep fallback sync path active when API is unavailable.
+            }
+        }
+
+        async function checkForConfigUpdates() {
+            await checkApiVersionAndSync();
+            
+            // API polling fallback if version endpoint is unavailable.
+            try {
+                const response = await fetch(`/api/config?t=${Date.now()}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const newConfig = normalizeConfig(data);
+                    
+                    const newChecksum = generateConfigChecksum(newConfig);
+                    
+                    if (lastConfigChecksum === null) {
+                        lastConfigChecksum = newChecksum;
+                        console.log('📋 Config checksum initialized from API');
+                    } else if (lastConfigChecksum !== newChecksum) {
+                        console.log('🔔 Config change detected from API - applying dynamic update');
+                        lastConfigChecksum = newChecksum;
+                        if (wheelSpinning) {
+                            pendingConfigApply = newConfig;
+                            console.log('⏳ Spin in progress, update queued');
+                        } else {
+                            applyConfigUpdate(newConfig);
+                        }
+                    }
+                }
+            } catch(e) {
+                // Silent fail - API may not be available
+            }
+        }
+
+        function applyConfigUpdate(newConfig) {
+            try {
+                console.log('🔄 Applying config update silently');
+                
+                // Update global variables
+                activeConfig = newConfig;
+                MAX_SPINS_PER_DAY = newConfig.maxSpinsPerDay || 3;
+                
+                // If wheel is spinning, don't interrupt - update will apply after
+                if (wheelSpinning) {
+                    console.log('⏳ Wheel spinning, update queued for after spin');
+                    return;
+                }
+                
+                // Stop any existing animation
+                if (theWheel) {
+                    theWheel.stopAnimation(false);
+                }
+                
+                // Rebuild wheel with new segments
+                const newSegments = buildSegments(newConfig);
+                console.log('📊 New wheel segments:', newSegments.length);
+                
+                // Recreate wheel completely
+                theWheel = new Winwheel({
+                    'numSegments': newSegments.length,
+                    'outerRadius': 212,
+                    'innerRadius': 50,
+                    'textFontSize': newSegments.length > 8 ? 14 : 18,
+                    'textWeight': 'bold',
+                    'textMargin': 0,
+                    'segments': newSegments,
+                    'lineWidth': 2,
+                    'strokeStyle': '#ffffff',
+                    'animation': {
+                        'type': 'spinToStop',
+                        'duration': 6,
+                        'spins': 8,
+                        'callbackFinished': alertPrize,
+                        'callbackSound': playTickSound,
+                        'soundTrigger': 'pin'
+                    },
+                    'pins': {
+                        'number': newSegments.length,
+                        'fillStyle': '#ffffff',
+                        'outerRadius': 5,
+                        'responsive': true,
+                        'strokeStyle': '#128C7E'
+                    }
+                });
+                
+                // Reset and redraw
+                theWheel.rotationAngle = 0;
+                theWheel.draw();
+                
+                // Update UI silently
+                updateSpinUI();
+                powerSelected(2);
+                
+                console.log('✅ Config updated silently - spins now:', MAX_SPINS_PER_DAY);
+            } catch(error) {
+                console.error('❌ Error applying config:', error);
+            }
+        }
+
+        function startConfigSyncProcess() {
+            console.log('🔄 Starting config sync process...');
+            
+            // Try to use BroadcastChannel for same-origin communication
+            if (typeof BroadcastChannel !== 'undefined') {
+                try {
+                    configSyncChannel = new BroadcastChannel(CONFIG_KEY);
+                    configSyncChannel.onmessage = (event) => {
+                        if (event.data.type === 'CONFIG_UPDATED') {
+                            console.log('📢 Broadcast signal received - checking for updates');
+                            // Immediately check for updates when broadcast received
+                            setTimeout(checkForConfigUpdates, 50);
+                        }
+                    };
+                    console.log('✅ BroadcastChannel ready for sync');
+                } catch(e) {
+                    console.warn("BroadcastChannel not available, using polling only");
+                }
+            }
+            
+            // Check for updates every 1 second (primary sync mechanism)
+            console.log('⏱️ Starting 1-second polling for config changes');
+            setInterval(checkForConfigUpdates, 1000);
+            
+            // Also check on visibility change (when user switches tabs)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    console.log('👀 Page became visible - checking for updates');
+                    checkForConfigUpdates();
+                }
+            });
+            
+            // Check immediately on page focus
+            window.addEventListener('focus', () => {
+                console.log('👁️ Window focused - checking for updates');
+                checkForConfigUpdates();
+            });
+        }
+
+        function showSyncNotification(message) {
+            const existingNotif = document.getElementById('sync-notification');
+            if (existingNotif) {
+                existingNotif.remove();
+            }
+            
+            const notif = document.createElement('div');
+            notif.id = 'sync-notification';
+            notif.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #25D366;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                animation: slideIn 0.3s ease-out;
+            `;
+            notif.innerText = message;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function showLimitModal() {
+            const modal = document.getElementById('resultModal');
+            const title = document.getElementById('modalTitle');
+            const text = document.getElementById('resultText');
+            const claimBtn = document.getElementById('claimBtn');
+
+            title.innerText = "Limit Reached! 🛑";
+            title.style.color = "#e74c3c";
+            text.innerText = "You have reached your spin limit for today! Please come back tomorrow.";
+            claimBtn.style.display = 'none';
+
+            modal.classList.add('show');
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+        }
+
+        async function startSpin() {
+            // Refresh latest admin config right before each spin for fully dynamic behavior.
+            try {
+                activeConfig = await fetchConfigFromApi();
+                MAX_SPINS_PER_DAY = activeConfig.maxSpinsPerDay || 3;
+            } catch (e) {
+                await loadConfig();
+            }
+            const latestChecksum = generateConfigChecksum(activeConfig);
+            if (lastConfigChecksum !== latestChecksum && !wheelSpinning) {
+                lastConfigChecksum = latestChecksum;
+                applyConfigUpdate(activeConfig);
+            }
+
+            const data = getSpinData();
+            if (data.count >= MAX_SPINS_PER_DAY) {
+                showLimitModal();
+                return;
+            }
+
+            if (wheelSpinning == false) {
+                // Remove the redundant powerSelected call if wheelPower is already set
+                if (wheelPower == 0) wheelPower = 2;
+
+                // ---------------------------------------------------------
+                // DYNAMIC RIGGED LOGIC: Read from dynamic config and check stock
+                // ---------------------------------------------------------
+                const prizes = activeConfig.prizes || activeConfig;
+                
+                // Get active enabled prizes with stock > 0
+                const activePrizes = prizes.filter(item => item.enabled && item.stock > 0);
+                const totalPrizeProb = activePrizes.reduce((acc, item) => acc + item.probability, 0);
+
+                const chance = Math.random() * 100; // 0.0 to 100.0
+                let winningSegmentNumber = null;
+
+                let cumulativeProb = 0;
+                for (let i = 0; i < activePrizes.length; i++) {
+                    const item = activePrizes[i];
+                    cumulativeProb += item.probability;
+                    if (chance < cumulativeProb) {
+                        const enabledPrizes = prizes.filter(p => p.enabled);
+                        const prizeIndex = enabledPrizes.findIndex(p => p.id === item.id);
+                        if (prizeIndex !== -1) {
+                            winningSegmentNumber = (prizeIndex * 2) + 1;
+                        }
+                        break;
+                    }
+                }
+
+                if (winningSegmentNumber === null) {
+                    // Land on "Try Again"
+                    const totalSegments = theWheel.numSegments;
+                    const tryAgainIndices = [];
+                    for (let s = 2; s <= totalSegments; s += 2) {
+                        tryAgainIndices.push(s);
+                    }
+                    winningSegmentNumber = tryAgainIndices[Math.floor(Math.random() * tryAgainIndices.length)] || 2;
+                }
+
+                // Calculate stop angle
+                const stopAt = theWheel.getRandomForSegment(winningSegmentNumber);
+                theWheel.animation.stopAngle = stopAt;
+
+                // Set spins based on power
+                if (wheelPower == 1) theWheel.animation.spins = 3;
+                else if (wheelPower == 2) theWheel.animation.spins = 6;
+                else if (wheelPower == 3) theWheel.animation.spins = 10;
+
+                // UI Updates
+                document.getElementById('spin_button').classList.add('disabled');
+                document.getElementById('spin_button').style.cursor = "default";
+
+                // Update spin count
+                saveSpinData(data.count + 1);
+
+                // Start
+                theWheel.startAnimation();
+                wheelSpinning = true;
+
+                // Ensure Audio Context is ready (user interaction required for browsers)
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+        }
+
+        function resetWheel() {
+            theWheel.stopAnimation(false);
+            theWheel.rotationAngle = 0;
+            theWheel.draw();
+
+            wheelSpinning = false;
+            // Keep power at the default level
+            powerSelected(2);
+            document.getElementById('resultModal').classList.remove('show');
+
+            if (pendingConfigApply) {
+                const queuedConfig = pendingConfigApply;
+                pendingConfigApply = null;
+                applyConfigUpdate(queuedConfig);
+            }
+        }
+
+        async function decrementStock(itemId, itemName) {
+            try {
+                const response = await fetch('/api/config/decrement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemId, itemName })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    // Handle both old array format and new object format
+                    if (Array.isArray(result.data)) {
+                        activeConfig = { maxSpinsPerDay: MAX_SPINS_PER_DAY, prizes: result.data };
+                    } else {
+                        activeConfig = result.data;
+                    }
+
+                    if (configSyncChannel) {
+                        configSyncChannel.postMessage({
+                            type: 'CONFIG_UPDATED',
+                            source: 'index',
+                            timestamp: Date.now()
+                        });
+                    }
+                    return;
+                }
+            } catch(e) {
+                console.warn("API write failed while decrementing stock", e);
+            }
+        }
+
+        function alertPrize(indicatedSegment) {
+            const modal = document.getElementById('resultModal');
+            const title = document.getElementById('modalTitle');
+            const text = document.getElementById('resultText');
+            const saveBtn = document.getElementById('saveBtn');
+            const claimBtn = document.getElementById('claimBtn');
+
+            if (indicatedSegment.isPrize) {
+                decrementStock(indicatedSegment.id, indicatedSegment.text);
+
+                title.innerText = "🎉 Congratulations! 🎉";
+                title.style.color = "#25D366";
+                text.innerHTML = `You won: <b>${indicatedSegment.text}</b><br>Show this to the desk to claim your reward!`;
+                // saveBtn.style.display = 'block';
+                claimBtn.style.display = 'block';
+
+                // Prepare ticket data
+                document.getElementById('ticketPrize').innerText = indicatedSegment.text;
+                // Use toLocaleString for Date AND Time
+                document.getElementById('ticketDate').innerText = new Date().toLocaleString();
+
+            } else {
+                const data = getSpinData();
+                if (data.count >= MAX_SPINS_PER_DAY) {
+                    title.innerText = "Limit Reached! 🛑";
+                    title.style.color = "#e74c3c";
+                    text.innerText = "So sorry, you didn't win this time. You have reached your limit for today! Come back tomorrow.";
+                } else {
+                    title.innerText = "Try Again!";
+                    title.style.color = "#555";
+                    text.innerText = "So sorry, you didn’t win this time. Try next spin!";
+                }
+                claimBtn.style.display = 'none';
+            }
+
+            modal.classList.add('show');
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+        }
+
+        function claimReward() {
+            const title = document.getElementById('modalTitle');
+            const text = document.getElementById('resultText');
+            const claimBtn = document.getElementById('claimBtn');
+
+            title.innerText = "Claim Your Prize! 🎁";
+            title.style.color = "#128C7E";
+            text.innerHTML = "Show this screen to our staff at the desk to receive your gift!";
+            claimBtn.style.display = 'none';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.visibility = 'hidden';
+                modal.style.opacity = '0';
+            }, 300);
+            resetWheel();
+        }
+
+        function saveTicket() {
+            const ticketPrize = document.getElementById('ticketPrize').innerText;
+            const ticketDate = document.getElementById('ticketDate').innerText;
+
+            // Create a temporary container for rendering
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.zIndex = '-9999';
+            container.style.backgroundColor = '#ffffff';
+
+            // Re-create ticket HTML structure for simpler capture
+            container.innerHTML = `
+                <div style="background: white; padding: 40px; border: 4px solid #25D366; border-radius: 20px; text-align: center; font-family: sans-serif; width: 400px; box-sizing: border-box; display: inline-block;">
+                    <img src="nchat-logo.png" style="width: 100px; margin-bottom: 20px;">
+                    <h1 style="color: #128C7E; margin: 0; font-size: 20px;">WINNER TICKET</h1>
+                    <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+                    <h2 style="font-size: 32px; margin: 10px 0; color: #333;">${ticketPrize}</h2>
+                    <p style="color: #666; font-size: 14px;">Issued: <span>${ticketDate}</span></p>
+                    <p style="font-size: 12px; color: #999; margin-top: 20px;">Present this ticket at the desk.</p>
+                </div>
+            `;
+
+            document.body.appendChild(container);
+
+            // Wait a brief moment for DOM to settle/images to load (if cached)
+            setTimeout(() => {
+                html2canvas(container.querySelector('div'), {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    const image = canvas.toDataURL("image/png");
+                    const link = document.createElement('a');
+                    link.download = 'NChat-Prize.png';
+                    link.href = image;
+                    link.click();
+                    document.body.removeChild(container);
+                }).catch(err => {
+                    console.error("Capture failed:", err);
+                    alert("Could not save ticket. Please manually screenshot.");
+                    if (document.body.contains(container)) document.body.removeChild(container);
+                });
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>

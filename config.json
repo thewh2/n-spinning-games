@@ -1,0 +1,45 @@
+{
+  "maxSpinsPerDay": 3,
+  "prizes": [
+    {
+      "id": 1,
+      "name": "Wallet Ladies",
+      "icon": "👜",
+      "probability": 2,
+      "stock": 10,
+      "isPrize": true,
+      "enabled": true,
+      "winCount": 0
+    },
+    {
+      "id": 3,
+      "name": "Wallet Men",
+      "icon": "💼",
+      "probability": 2,
+      "stock": 10,
+      "isPrize": true,
+      "enabled": true,
+      "winCount": 0
+    },
+    {
+      "id": 5,
+      "name": "Pickle Ball",
+      "icon": "🎾",
+      "probability": 5,
+      "stock": 10,
+      "isPrize": true,
+      "enabled": true,
+      "winCount": 0
+    },
+    {
+      "id": 7,
+      "name": "Pen",
+      "icon": "🖊️",
+      "probability": 15,
+      "stock": 10,
+      "isPrize": true,
+      "enabled": true,
+      "winCount": 0
+    }
+  ]
+}

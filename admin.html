@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NChat - Wheel Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #25D366;
+            --primary-dark: #128C7E;
+            --accent-color: #34B7F1;
+            --bg-gradient: linear-gradient(160deg, #FFFFFF 0%, #bbffcd 70%, #9effc2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #111b21;
+            --danger-color: #e74c3c;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin: 20px 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-img {
+            max-width: 90px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #54656f;
+            font-size: 0.95rem;
+        }
+
+        /* NChat Accent Buttons */
+        .btn-nchat {
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(18, 140, 126, 0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-nchat:hover {
+            background-color: #0f7065;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-nchat:active {
+            transform: translateY(0);
+        }
+
+        .btn-nchat-success {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+        }
+
+        .btn-nchat-success:hover {
+            background-color: #1ebe5d;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Switch toggle button */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Table Inputs styling */
+        .table-input {
+            border: 2px solid #e9edef;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .table-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .stock-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 140px;
+        }
+
+        .stock-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #e9edef;
+            background: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-dark);
+        }
+
+        .stock-btn:hover {
+            border-color: var(--primary-color);
+            background: #f0fdf4;
+        }
+
+        .stock-input {
+            width: 50px !important;
+            text-align: center;
+            padding: 4px 6px !important;
+        }
+
+        /* Custom Modal Customizations */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            border-bottom: 1px solid #e9edef;
+        }
+
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            border-top: 1px solid #e9edef;
+        }
+
+        .action-icon-btn {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            min-height: 34px;
+            padding: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .admin-container {
+                padding: 16px;
+                border-radius: 16px;
+                margin: 12px 0;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.1rem;
+            }
+
+            .logo-img {
+                max-width: 70px;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+            }
+
+            /* Login Form */
+            .form-control {
+                padding: 12px 14px;
+                font-size: 16px;
+                border-radius: 8px;
+            }
+
+            .form-label {
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+
+            /* Buttons - Touch friendly (min 44px) */
+            .btn {
+                padding: 12px 16px !important;
+                font-size: 0.95rem;
+                min-height: 44px;
+                border-radius: 10px;
+            }
+
+            .btn-sm {
+                padding: 10px 12px !important;
+                font-size: 0.85rem;
+                min-height: 40px;
+            }
+
+            /* Max Spins Control */
+            #max-spins-input {
+                width: 70px !important;
+                font-size: 16px;
+                padding: 10px !important;
+            }
+
+            /* Table Responsiveness */
+            .table-responsive {
+                border-radius: 12px;
+                overflow-x: auto;
+            }
+
+            .table {
+                font-size: 0.85rem;
+            }
+
+            .table thead {
+                font-size: 0.75rem;
+            }
+
+            .table-input {
+                padding: 8px 6px;
+                font-size: 14px;
+                border-radius: 6px;
+            }
+
+            .stock-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.1rem;
+                min-height: 34px;
+            }
+
+            .stock-input {
+                width: 50px !important;
+                font-size: 14px;
+            }
+
+            .stock-control {
+                max-width: 150px;
+            }
+
+            /* Badge styling */
+            .badge {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+
+            /* Switch - larger for touch */
+            .switch {
+                width: 50px;
+                height: 26px;
+            }
+
+            .slider:before {
+                height: 18px;
+                width: 18px;
+                bottom: 4px;
+            }
+
+            input:checked + .slider:before {
+                transform: translateX(24px);
+            }
+
+            /* Modal adjustments */
+            .modal-content {
+                border-radius: 14px;
+            }
+
+            .modal-header {
+                padding: 16px;
+            }
+
+            .modal-title {
+                font-size: 1.1rem;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .modal-footer {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            /* Dashboard header responsive */
+            .dashboard-header {
+                flex-direction: row;
+                align-items: flex-start !important;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .dashboard-header h2 {
+                margin: 0;
+                font-size: 1rem;
+                flex: 1;
+                line-height: 1.2;
+            }
+
+            .dashboard-header a {
+                align-self: flex-start;
+                margin-top: 2px;
+                white-space: nowrap;
+                font-size: 0.9rem;
+            }
+
+            /* Spins per day card */
+            .card {
+                border-radius: 12px;
+            }
+
+            .card p {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .admin-container {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo-img {
+                max-width: 60px;
+            }
+
+            .btn {
+                padding: 10px 12px !important;
+                font-size: 0.9rem;
+            }
+
+            /* Table font even smaller on extra small */
+            .table {
+                font-size: 0.75rem;
+            }
+
+            .table thead {
+                font-size: 0.7rem;
+            }
+
+            .table-input {
+                padding: 6px 4px;
+                font-size: 13px;
+            }
+
+            #max-spins-input {
+                width: 60px !important;
+                font-size: 14px;
+            }
+
+            /* Hide status column on very small screens and keep win count visible */
+            .table th:nth-child(6),
+            .table td:nth-child(6) {
+                display: none;
+            }
+
+            /* Adjust remaining column widths */
+            .table th:first-child,
+            .table td:first-child {
+                width: 40px;
+            }
+
+            /* Modal improvements for mobile */
+            .modal-content {
+                border-radius: 12px;
+            }
+
+            .modal-body {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+
+            .modal-title {
+                font-size: 1rem;
+            }
+
+            .modal-footer {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .modal-footer .btn {
+                flex: 1;
+                min-width: 100px;
+                min-height: 44px;
+                font-size: 0.9rem;
+            }
+
+            /* Modal form inputs - increased width and padding on mobile */
+            .modal-body .form-control {
+                width: 100% !important;
+                font-size: 16px !important;
+                padding: 14px !important;
+                border-radius: 8px;
+            }
+
+            .modal-body .form-label {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+            }
+
+            .modal-body .mb-3 {
+                margin-bottom: 14px !important;
+            }
+
+            /* Button container spacing */
+            .d-flex.gap-2 {
+                flex-wrap: wrap;
+                gap: 8px !important;
+            }
+
+            .d-flex.gap-2 .btn {
+                flex: 1;
+                min-width: 130px;
+                min-height: 44px;
+            }
+
+            .table td:last-child .btn {
+                min-height: 34px;
+                padding: 6px 8px !important;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="header">
+            <img src="nchat-logo.png" alt="NChat Logo" class="logo-img">
+            <h1>NChat Rewards Admin</h1>
+            <p class="subtitle">Manage wheel prize names, dynamic icons, stock, and probability</p>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login-screen" class="card p-4 shadow-sm border-0">
+            <div class="mb-3">
+                <label class="form-label fw-bold" style="color: var(--primary-dark);">Username</label>
+                <input type="text" id="username" class="form-control" placeholder="Enter username" style="border-radius: 10px;">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold" style="color: var(--primary-dark);">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" style="border-radius: 10px 0 0 10px;">
+                    <button type="button" id="password-toggle-btn" class="btn btn-outline-secondary" style="border-radius: 0 10px 10px 0; min-height: 44px;" onclick="togglePasswordVisibility()">Show</button>
+                </div>
+            </div>
+            <div id="login-error" class="alert alert-danger p-2 text-center" style="display: none; font-size: 0.9rem; font-weight: 600;">
+                Invalid username or password
+            </div>
+            <button class="btn btn-nchat w-100 py-2" onclick="handleLogin()">Login</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-screen">
+            <div class="dashboard-header d-flex justify-content-between align-items-center mb-4 border-bottom border-dashed pb-2">
+                <a class="text-danger fw-bold text-decoration-none" style="cursor: pointer;" onclick="handleLogout()">Logout</a>
+            </div>
+
+            <div id="alert-msg" class="alert alert-warning py-2 mb-3" style="display: none;"></div>
+            <div id="config-change-msg" class="alert alert-info py-2 mb-3" style="display: none;"></div>
+
+            <!-- Spins Per Day Control -->
+            <div class="card p-4 shadow-sm border-0 mb-4" style="background: #f8f9fa;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <label class="form-label fw-bold mb-0" style="color: var(--primary-dark); font-size: 1rem;">Maximum Spins Per Day</label>
+                        <p class="text-muted mb-0" style="font-size: 0.85rem;">Set how many times users can spin the wheel each day</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" id="max-spins-input" class="form-control" style="width: 80px; text-align: center; border-radius: 8px;" min="1" max="100" value="3" onchange="updateSpinsPerDay(this.value)">
+                        <span style="font-weight: bold; color: var(--primary-dark); font-size: 1.1rem;">spins</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted fw-bold" style="font-size: 0.9rem;">Configure Prizes:</span>
+                <span class="badge text-bg-success" id="total-win-count" style="font-size: 0.85rem;">Total Wins: 0</span>
+                <!-- Button to trigger Bootstrap Modal -->
+                <button class="btn btn-nchat-success btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                    ➕ Add New Item
+                </button>
+            </div>
+
+            <!-- Configuration Table -->
+            <div class="table-responsive rounded shadow-sm border mb-4 bg-white">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <tr>
+                            <th style="width: 100px;">Icon</th>
+                            <th width="40%">Item Name</th>
+                            <th>Win Probability (%)</th>
+                            <th>Stock Level</th>
+                            <th style="width: 110px;">Win Count</th>
+                            <th style="width: 120px;">Status</th>
+                            <th style="width: 90px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="config-table-body">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary px-4" data-bs-toggle="modal" data-bs-target="#confirmResetModal">Reset to Defaults</button>
+                <button class="btn btn-nchat px-4" data-bs-toggle="modal" data-bs-target="#confirmSaveModal">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Modal for Adding New Item -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addItemModalLabel" style="color: var(--primary-dark);">Add New Prize Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Item Icon / Emoji</label>
+                        <input type="text" id="new-icon" class="form-control" placeholder="e.g. 🎁 or 🥤" style="font-size: 16px; padding: 12px;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Item Name</label>
+                        <input type="text" id="new-name" class="form-control" placeholder="e.g. Luxury Gift" style="font-size: 16px; padding: 12px;">
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6 mb-3">
+                            <label class="form-label fw-bold">Probability (%)</label>
+                            <input type="number" id="new-prob" class="form-control" min="0" max="100" value="5" style="font-size: 16px; padding: 12px;">
+                        </div>
+                        <div class="col-12 col-sm-6 mb-3">
+                            <label class="form-label fw-bold">Stock Level</label>
+                            <input type="number" id="new-stock" class="form-control" min="0" value="10" style="font-size: 16px; padding: 12px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="min-height: 44px;">Cancel</button>
+                    <button type="button" class="btn btn-nchat-success" onclick="addItem()" style="min-height: 44px;">Add Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Modal for Editing Item -->
+    <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editItemModalLabel" style="color: var(--primary-dark);">Edit Prize Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-item-index">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Item Icon / Emoji</label>
+                        <input type="text" id="edit-icon" class="form-control" placeholder="e.g. 🎁 or 🥤" style="font-size: 16px; padding: 12px;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Item Name</label>
+                        <input type="text" id="edit-name" class="form-control" placeholder="e.g. Luxury Gift" style="font-size: 16px; padding: 12px;">
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6 mb-3">
+                            <label class="form-label fw-bold">Probability (%)</label>
+                            <input type="number" id="edit-prob" class="form-control" min="0" max="100" value="5" style="font-size: 16px; padding: 12px;">
+                        </div>
+                        <div class="col-12 col-sm-6 mb-3">
+                            <label class="form-label fw-bold">Stock Level</label>
+                            <input type="number" id="edit-stock" class="form-control" min="0" value="10" style="font-size: 16px; padding: 12px;">
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-enabled">
+                        <label class="form-check-label fw-bold" for="edit-enabled">Item Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="min-height: 44px;">Cancel</button>
+                    <button type="button" class="btn btn-nchat-success" onclick="saveEditedItem()" style="min-height: 44px;">Save Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Reset Defaults -->
+    <div class="modal fade" id="confirmResetModal" tabindex="-1" aria-labelledby="confirmResetLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning bg-opacity-10">
+                    <h5 class="modal-title fw-bold" id="confirmResetLabel" style="color: #c0392b;">⚠️ Reset Configuration?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 0; font-size: 0.95rem;">Are you sure you want to reset all item configurations to defaults?</p>
+                    <p style="color: #e74c3c; font-weight: 600; margin-top: 10px; margin-bottom: 0; font-size: 0.9rem;">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="min-height: 44px;">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmResetDefaults()" style="min-height: 44px;">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Save Configuration -->
+    <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info bg-opacity-10">
+                    <h5 class="modal-title fw-bold" id="confirmSaveLabel" style="color: var(--primary-dark);">💾 Save Configuration?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 0; font-size: 0.95rem;">Are you sure you want to save all configuration changes?</p>
+                    <p style="color: var(--primary-dark); font-weight: 600; margin-top: 10px; margin-bottom: 0; font-size: 0.9rem;">This will update the wheel configuration immediately.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="min-height: 44px;">No</button>
+                    <button type="button" class="btn btn-success" onclick="confirmSaveSettings()" style="min-height: 44px;">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const ADMIN_SESSION_KEY = '_nchat_admin_session';
+        const CONFIG_KEY = '_nchat_wheel_config';
+
+        // Fallback defaults with separated icons
+        const DEFAULT_CONFIG = {
+            maxSpinsPerDay: 3,
+            prizes: [
+                { id: 1, name: "Wallet Ladies", icon: "👜", probability: 2, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 3, name: "Wallet Men", icon: "💼", probability: 2, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 5, name: "Pickle Ball", icon: "🎾", probability: 5, stock: 10, isPrize: true, enabled: true, winCount: 0 },
+                { id: 7, name: "Pen", icon: "🖊️", probability: 15, stock: 10, isPrize: true, enabled: true, winCount: 0 }
+            ]
+        };
+
+        let currentConfig = {};
+        let addItemModalInstance;
+        let editItemModalInstance;
+        let adminBroadcastChannel = null;
+        let autoSaveTimer = null;
+        let configMsgTimer = null;
+        let adminConfigPollTimer = null;
+        let lastAdminConfigVersion = null;
+        let isConfigSyncInProgress = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            addItemModalInstance = new bootstrap.Modal(document.getElementById('addItemModal'));
+            editItemModalInstance = new bootstrap.Modal(document.getElementById('editItemModal'));
+            
+            // Initialize confirmation reset modal
+            const confirmResetModal = document.getElementById('confirmResetModal');
+            if (confirmResetModal) {
+                new bootstrap.Modal(confirmResetModal);
+            }
+
+            // Initialize confirmation save modal
+            const confirmSaveModal = document.getElementById('confirmSaveModal');
+            if (confirmSaveModal) {
+                new bootstrap.Modal(confirmSaveModal);
+            }
+            
+            // Initialize BroadcastChannel for config sync
+            if (typeof BroadcastChannel !== 'undefined') {
+                try {
+                    adminBroadcastChannel = new BroadcastChannel(CONFIG_KEY);
+                    adminBroadcastChannel.onmessage = async (event) => {
+                        if (event && event.data && event.data.type === 'CONFIG_UPDATED') {
+                            await syncConfigFromServer(false);
+                        }
+                    };
+                    console.log('✅ Admin BroadcastChannel ready');
+                } catch(e) {
+                    console.warn("BroadcastChannel not available");
+                }
+            } else {
+                console.warn("⚠️ BroadcastChannel not supported");
+            }
+            
+            if (sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true') {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        });
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('password-toggle-btn');
+
+            if (!passwordInput || !toggleBtn) {
+                return;
+            }
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+
+        async function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (response.ok) {
+                    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+                    errorDiv.style.display = 'none';
+                    showDashboard();
+                    return;
+                }
+            } catch (e) {
+                console.error('Login request failed', e);
+            }
+
+            errorDiv.style.display = 'block';
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem(ADMIN_SESSION_KEY);
+            stopAdminConfigSync();
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('dashboard-screen').style.display = 'none';
+        }
+
+        async function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+            await loadConfig();
+            document.getElementById('max-spins-input').value = currentConfig.maxSpinsPerDay || 3;
+            renderTable();
+            await initializeAdminConfigVersion();
+            startAdminConfigSync();
+        }
+
+        async function initializeAdminConfigVersion() {
+            try {
+                const versionRes = await fetch(`/api/config/version?t=${Date.now()}`);
+                if (versionRes.ok) {
+                    const versionData = await versionRes.json();
+                    lastAdminConfigVersion = Number(versionData.version || 0);
+                }
+            } catch (e) {
+                // Ignore - polling fallback will continue trying.
+            }
+        }
+
+        function startAdminConfigSync() {
+            stopAdminConfigSync();
+            adminConfigPollTimer = setInterval(checkForAdminConfigUpdates, 1000);
+
+            window.addEventListener('focus', checkForAdminConfigUpdates);
+            document.addEventListener('visibilitychange', onAdminVisibilityChange);
+        }
+
+        function stopAdminConfigSync() {
+            if (adminConfigPollTimer) {
+                clearInterval(adminConfigPollTimer);
+                adminConfigPollTimer = null;
+            }
+
+            window.removeEventListener('focus', checkForAdminConfigUpdates);
+            document.removeEventListener('visibilitychange', onAdminVisibilityChange);
+        }
+
+        function onAdminVisibilityChange() {
+            if (!document.hidden) {
+                checkForAdminConfigUpdates();
+            }
+        }
+
+        async function checkForAdminConfigUpdates() {
+            try {
+                const versionRes = await fetch(`/api/config/version?t=${Date.now()}`);
+                if (!versionRes.ok) {
+                    return;
+                }
+
+                const versionData = await versionRes.json();
+                const serverVersion = Number(versionData.version || 0);
+
+                if (lastAdminConfigVersion === null) {
+                    lastAdminConfigVersion = serverVersion;
+                    return;
+                }
+
+                if (serverVersion !== lastAdminConfigVersion) {
+                    lastAdminConfigVersion = serverVersion;
+                    await syncConfigFromServer(false);
+                }
+            } catch (e) {
+                // Keep silent and continue polling.
+            }
+        }
+
+        async function syncConfigFromServer(showMessage = false) {
+            if (isConfigSyncInProgress) {
+                return;
+            }
+
+            isConfigSyncInProgress = true;
+            try {
+                await loadConfig();
+                document.getElementById('max-spins-input').value = currentConfig.maxSpinsPerDay || 3;
+                renderTable();
+                if (showMessage) {
+                    showConfigMessage("Configuration synced from server.", "info", 1600);
+                }
+            } finally {
+                isConfigSyncInProgress = false;
+            }
+        }
+
+        // Fetch settings from API server only (source of truth: config.json)
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Handle both old array format and new object format
+                    if (Array.isArray(data)) {
+                        currentConfig = { maxSpinsPerDay: 3, prizes: data };
+                    } else {
+                        currentConfig = data;
+                    }
+                    return;
+                }
+            } catch(e) {
+                console.warn("API server not detected. Using defaults.", e);
+            }
+
+            currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('config-table-body');
+            tbody.innerHTML = '';
+
+            const prizes = currentConfig.prizes || currentConfig;
+            let totalProb = 0;
+            let totalWins = 0;
+
+            prizes.forEach((item, index) => {
+                if (item.enabled) {
+                    totalProb += item.probability;
+                }
+                totalWins += Number(item.winCount || 0);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <input type="text" class="table-input text-center" style="max-width: 60px;" value="${item.icon || ''}" onchange="updateItemIcon(${index}, this.value)" placeholder="emoji">
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" value="${item.name}" onchange="updateItemName(${index}, this.value)">
+                    </td>
+                    <td>
+                        <input type="number" class="table-input" min="0" max="100" step="any" value="${item.probability}" onchange="updateItemProbability(${index}, this.value)">
+                    </td>
+                    <td>
+                        <div class="stock-control">
+                            <button class="stock-btn" onclick="adjustStock(${index}, -1)">−</button>
+                            <input type="number" min="0" class="table-input stock-input" id="stock-input-${index}" value="${item.stock}" onchange="updateItemStock(${index}, this.value)">
+                            <button class="stock-btn" onclick="adjustStock(${index}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge text-bg-primary">${Number(item.winCount || 0)}</span>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" ${item.enabled ? 'checked' : ''} onchange="toggleItem(${index}, this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ms-2 fw-bold" style="font-size: 0.8rem; color: ${item.enabled ? 'var(--primary-color)' : '#7f8c8d'};">
+                            ${item.enabled ? 'Active' : 'Disabled'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 justify-content-center">
+                            <button class="btn btn-outline-primary btn-sm action-icon-btn" onclick="openEditItemModal(${index})" title="Edit item" aria-label="Edit item">✏️</button>
+                            <button class="btn btn-outline-danger btn-sm action-icon-btn" onclick="deleteItem(${index})" title="Delete item" aria-label="Delete item">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalWinEl = document.getElementById('total-win-count');
+            if (totalWinEl) {
+                totalWinEl.innerText = `Total Wins: ${totalWins}`;
+            }
+
+            // Validate total probability of enabled prizes
+            const alertBox = document.getElementById('alert-msg');
+            if (totalProb > 100) {
+                alertBox.innerText = `⚠️ Total probability of ENABLED prizes (${totalProb.toFixed(1)}%) exceeds 100%! Please decrease some probabilities.`;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
+        }
+
+        function updateItemIcon(index, val) {
+            currentConfig.prizes[index].icon = val.trim();
+            scheduleAutoSave();
+        }
+
+        function updateItemName(index, val) {
+            currentConfig.prizes[index].name = val.trim();
+            scheduleAutoSave();
+        }
+
+        function updateItemProbability(index, val) {
+            let prob = parseFloat(val) || 0;
+            if (prob < 0) prob = 0;
+            if (prob > 100) prob = 100;
+            currentConfig.prizes[index].probability = prob;
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function updateItemStock(index, val) {
+            let stock = parseInt(val, 10);
+            if (isNaN(stock) || stock < 0) stock = 0;
+            currentConfig.prizes[index].stock = stock;
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function adjustStock(index, delta) {
+            let stock = currentConfig.prizes[index].stock + delta;
+            if (stock < 0) stock = 0;
+            currentConfig.prizes[index].stock = stock;
+            document.getElementById(`stock-input-${index}`).value = stock;
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function toggleItem(index, val) {
+            currentConfig.prizes[index].enabled = val;
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function deleteItem(index) {
+            const itemName = currentConfig.prizes[index].name;
+            const deleteConfirmModal = document.createElement('div');
+            deleteConfirmModal.className = 'modal fade';
+            deleteConfirmModal.setAttribute('tabindex', '-1');
+            deleteConfirmModal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger bg-opacity-10">
+                            <h5 class="modal-title fw-bold" style="color: #c0392b;">🗑️ Delete Item?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 0; font-size: 0.95rem;">Are you sure you want to delete <strong>"${itemName}"</strong>?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="min-height: 44px;">Cancel</button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDeleteItem(${index})" style="min-height: 44px;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(deleteConfirmModal);
+            const modal = new bootstrap.Modal(deleteConfirmModal);
+            modal.show();
+            
+            deleteConfirmModal.addEventListener('hidden.bs.modal', () => {
+                deleteConfirmModal.remove();
+            });
+        }
+
+        function confirmDeleteItem(index) {
+            currentConfig.prizes.splice(index, 1);
+            renderTable();
+            scheduleAutoSave();
+            
+            // Close all modals
+            const modals = document.querySelectorAll('.modal.show');
+            modals.forEach(modal => {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) bsModal.hide();
+            });
+        }
+
+        function updateSpinsPerDay(val) {
+            const previousSpins = currentConfig.maxSpinsPerDay;
+            let spins = parseInt(val, 10) || 1;
+            
+            // Prevent spin value from being 0
+            if (spins < 1) {
+                // If previous value was 3 and new value is greater than 3, maintain at least the previous value
+                if (previousSpins === 3 && parseInt(val, 10) > 3) {
+                    spins = previousSpins;
+                } else {
+                    spins = 1;
+                }
+            }
+            
+            if (spins > 100) spins = 100;
+            currentConfig.maxSpinsPerDay = spins;
+            document.getElementById('max-spins-input').value = spins;
+            scheduleAutoSave();
+        }
+
+        function addItem() {
+            const icon = document.getElementById('new-icon').value.trim();
+            const name = document.getElementById('new-name').value.trim();
+            const prob = parseFloat(document.getElementById('new-prob').value) || 0;
+            const stock = parseInt(document.getElementById('new-stock').value, 10) || 0;
+
+            if (!name) {
+                showConfigMessage("Please enter a valid item name.", "danger", 3000);
+                return;
+            }
+
+            const newId = currentConfig.prizes.length > 0 ? Math.max(...currentConfig.prizes.map(i => i.id)) + 1 : 1;
+
+            currentConfig.prizes.push({
+                id: newId,
+                name: name,
+                icon: icon,
+                probability: prob,
+                stock: stock,
+                isPrize: true,
+                enabled: true,
+                winCount: 0
+            });
+
+            // Clear inputs and hide modal
+            document.getElementById('new-icon').value = '';
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-prob').value = '5';
+            document.getElementById('new-stock').value = '10';
+
+            addItemModalInstance.hide();
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function openEditItemModal(index) {
+            const item = currentConfig.prizes[index];
+            if (!item) {
+                return;
+            }
+
+            document.getElementById('edit-item-index').value = index;
+            document.getElementById('edit-icon').value = item.icon || '';
+            document.getElementById('edit-name').value = item.name || '';
+            document.getElementById('edit-prob').value = Number(item.probability || 0);
+            document.getElementById('edit-stock').value = Number(item.stock || 0);
+            document.getElementById('edit-enabled').checked = !!item.enabled;
+            editItemModalInstance.show();
+        }
+
+        function saveEditedItem() {
+            const index = parseInt(document.getElementById('edit-item-index').value, 10);
+            const item = currentConfig.prizes[index];
+
+            if (!item) {
+                return;
+            }
+
+            const name = document.getElementById('edit-name').value.trim();
+            if (!name) {
+                showConfigMessage("Please enter a valid item name.", "danger", 3000);
+                return;
+            }
+
+            let prob = parseFloat(document.getElementById('edit-prob').value);
+            if (isNaN(prob) || prob < 0) prob = 0;
+            if (prob > 100) prob = 100;
+
+            let stock = parseInt(document.getElementById('edit-stock').value, 10);
+            if (isNaN(stock) || stock < 0) stock = 0;
+
+            item.icon = document.getElementById('edit-icon').value.trim();
+            item.name = name;
+            item.probability = prob;
+            item.stock = stock;
+            item.enabled = document.getElementById('edit-enabled').checked;
+
+            editItemModalInstance.hide();
+            renderTable();
+            scheduleAutoSave();
+        }
+
+        function scheduleAutoSave() {
+            showConfigMessage("Configuration changed. Saving...", "warning", 0);
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                saveSettings(true);
+            }, 300);
+        }
+
+        function showConfigMessage(message, type = 'info', autoHideMs = 2500) {
+            let snackbar = document.getElementById('config-snackbar');
+            if (!snackbar) {
+                snackbar = document.createElement('div');
+                snackbar.id = 'config-snackbar';
+                snackbar.style.position = 'fixed';
+                snackbar.style.right = '20px';
+                snackbar.style.bottom = '20px';
+                snackbar.style.padding = '10px 14px';
+                snackbar.style.borderRadius = '8px';
+                snackbar.style.color = '#ffffff';
+                snackbar.style.fontWeight = '600';
+                snackbar.style.fontSize = '0.9rem';
+                snackbar.style.boxShadow = '0 8px 22px rgba(0,0,0,0.18)';
+                snackbar.style.zIndex = '99999';
+                snackbar.style.display = 'none';
+                document.body.appendChild(snackbar);
+            }
+
+            if (type === 'success') {
+                snackbar.style.background = '#1f9d55';
+            } else if (type === 'danger') {
+                snackbar.style.background = '#c0392b';
+            } else if (type === 'warning') {
+                snackbar.style.background = '#d97706';
+            } else {
+                snackbar.style.background = '#0f766e';
+            }
+
+            snackbar.textContent = message;
+            snackbar.style.display = 'block';
+
+            clearTimeout(configMsgTimer);
+            if (autoHideMs > 0) {
+                configMsgTimer = setTimeout(() => {
+                    snackbar.style.display = 'none';
+                }, autoHideMs);
+            }
+        }
+
+        async function confirmSaveSettings() {
+            // Close the confirmation modal
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal'));
+            if (confirmModal) {
+                confirmModal.hide();
+            }
+
+            // Call saveSettings with false to show full message flow
+            await saveSettings(false);
+        }
+
+        async function saveSettings(isSilent = false) {
+            const prizes = currentConfig.prizes || currentConfig;
+            let totalProb = prizes.reduce((acc, item) => acc + (item.enabled ? item.probability : 0), 0);
+            if (totalProb > 100) {
+                showConfigMessage("Cannot save: total probability exceeds 100%.", "danger", 4000);
+                return false;
+            }
+
+            if (isSilent) {
+                showConfigMessage("Configuration changed. Saving...", "warning", 0);
+            }
+            
+            // Broadcast to game page immediately
+            if (adminBroadcastChannel) {
+                adminBroadcastChannel.postMessage({
+                    type: 'CONFIG_UPDATED',
+                    timestamp: Date.now()
+                });
+                console.log('📢 Broadcast sent to game page');
+            }
+
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentConfig)
+                });
+                if (response.ok) {
+                    console.log('✅ Saved to server');
+                    showConfigMessage("Configuration updated successfully.", "success", 2200);
+                    await loadConfig();
+                    renderTable();
+                    return true;
+                }
+            } catch(e) {
+                console.warn("Server save failed", e);
+            }
+
+            showConfigMessage("Configuration save failed. API server unavailable.", "danger", 4500);
+            return false;
+        }
+
+        async function confirmResetDefaults() {
+            // Close the confirmation modal
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmResetModal'));
+            if (confirmModal) {
+                confirmModal.hide();
+            }
+
+            showConfigMessage("Resetting configuration...", "info", 0);
+            currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            
+            // Broadcast to game page immediately
+            if (adminBroadcastChannel) {
+                adminBroadcastChannel.postMessage({
+                    type: 'CONFIG_UPDATED',
+                    timestamp: Date.now()
+                });
+                console.log('📢 Broadcast sent (reset)');
+            }
+
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentConfig)
+                });
+                if (response.ok) {
+                    console.log('✅ Reset config saved to server');
+                    showConfigMessage("Configuration reset to defaults.", "success", 2600);
+                    await loadConfig();
+                    renderTable();
+                    return;
+                }
+            } catch(e) {
+                console.warn("Server reset failed", e);
+            }
+
+            showConfigMessage("Reset failed. API server is unavailable.", "danger", 4500);
+            renderTable();
+        }
+    </script>
+</body>
+</html>

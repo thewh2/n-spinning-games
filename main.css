@@ -1,0 +1,726 @@
+/* Modern Mobile-First Styles for Winwheel.js */
+:root {
+    --primary-color: #25D366;
+    /* NChat Green */
+    --primary-dark: #128C7E;
+    --accent-color: #34B7F1;
+    --background-color: #f0f2f5;
+    --text-color: #111b21;
+    --white: #ffffff;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Updated Gradient Background: White top to Greenish bottom */
+    background: linear-gradient(160deg, #FFFFFF 0%, #bbffcd 70%, #9effc2 100%);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.logo-container {
+    margin-bottom: 10px;
+}
+
+.logo-img {
+    /*Remove this padding when use of power selector*/
+    padding-top: 50px;
+    max-width: 120px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin: 10px 0 5px;
+    color: var(--primary-dark);
+}
+
+p {
+    margin: 0;
+    color: #54656f;
+    font-size: 0.95rem;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column-reverse;
+    /* Controls below wheel on mobile */
+    gap: 0rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    /* Slightly transparent for gradient to peek? No, solid is better for contrast */
+    background: linear-gradient(160deg, #FFFFFF 0%, #bbffcd 70%, #9effc2 100%);
+    padding: 20px 20px 40px 20px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Wheel Container */
+.the_wheel {
+    position: relative;
+    background-image: url('./wheel_back.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100%;
+    max-width: 434px;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+}
+
+/* Glossy Overlay */
+.the_wheel::after {
+    content: '';
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Premium 3D Pointer */
+.wheel-pointer {
+    width: 24px;
+    height: 56px;
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.3));
+    pointer-events: none;
+    transition: transform 0.1s ease-out;
+}
+
+.wheel-pointer::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff4c4c 0%, #c0392b 50%, #a93226 100%);
+    /* Broad top, sharp bottom tip */
+    clip-path: polygon(50% 100%, 0% 30%, 0% 0%, 100% 0%, 100% 30%);
+    border-radius: 50% 50% 0 0;
+    /* Rounds the top corners to merge with circle */
+    box-shadow: inset 0 -4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Pointer Hinge/Base */
+.wheel-pointer::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e9edef 40%, #95a5a6 100%);
+    border-radius: 50%;
+    border: 3px solid #7f8c8d;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 31;
+    /* Ensures it sits on top of the red part */
+}
+
+.wheel-center {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #25D366 30%, #128C7E 100%);
+    border-radius: 50%;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 4px solid #ffffff;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s, opacity 0.3s;
+    user-select: none;
+}
+
+.wheel-center:hover {
+    transform: scale(1.05);
+    background: radial-gradient(circle, #29e56f 30%, #149b8c 100%);
+}
+
+.wheel-center:active {
+    transform: scale(0.95);
+}
+
+.wheel-center.disabled {
+    background: radial-gradient(circle, #bdc3c7 30%, #95a5a6 100%);
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.spin-text-center {
+    font-weight: bold;
+    font-size: 11px;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+#canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 434px;
+    max-height: 434px;
+}
+
+/* Controls */
+.power_controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    width: 100%;
+}
+
+.power-level {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.power-btn {
+    flex: 1;
+    padding: 12px 10px;
+    background-color: #e9edef;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    color: #54656f;
+    font-size: 0.9rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.power-btn:active {
+    transform: scale(0.95);
+}
+
+.power-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 8px rgba(37, 211, 102, 0.4);
+}
+
+
+
+.reset-link {
+    text-decoration: none;
+    color: var(--primary-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    margin-bottom: 54px;
+    padding: 8px 14px;
+    border: 1px solid #111b21;
+    border-radius: 50px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.reset-link:active {
+    transform: scale(0.95);
+}
+
+/* Spin Count Display */
+.spin-count-container {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+    border: 2px solid var(--primary-color);
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spin-count-text {
+    font-weight: bold;
+    color: var(--primary-dark);
+    font-size: 1rem;
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.refresh-msg {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-weight: 600;
+    display: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 100%;
+    max-width: 340px;
+}
+
+.modal-overlay.show .modal {
+    transform: scale(1);
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: var(--primary-dark);
+    font-size: 1.5rem;
+}
+
+.modal p {
+    font-size: 1.1rem;
+    margin: 15px 0 25px;
+    color: #333;
+}
+
+.modal-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+    transition: transform 0.1s;
+    min-height: 44px;
+    -webkit-user-select: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-btn:active {
+    transform: scale(0.98);
+}
+
+/* Ticket Styles */
+.ticket-container {
+    background: #fff;
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+    /* Hidden by default */
+}
+
+.ticket-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 6px 6px 0 0;
+    font-weight: bold;
+}
+
+.ticket-content {
+    padding: 15px;
+}
+
+.ticket-prize {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin: 10px 0;
+}
+
+.ticket-code {
+    background: #f0f0f0;
+    padding: 5px 10px;
+    font-family: monospace;
+    letter-spacing: 2px;
+    border-radius: 4px;
+}
+
+@media (min-width: 768px) {
+    .game-container {
+        flex-direction: row;
+        max-width: 900px;
+        padding: 40px;
+    }
+
+    .power_controls {
+        align-items: flex-start;
+        width: 300px;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+    }
+
+    .logo-img {
+        padding-top: 0;
+        max-width: 140px;
+    }
+
+    .spin-text-center {
+        font-size: 13px;
+    }
+
+    .spin-count-text {
+        font-size: 1.1rem;
+    }
+
+    .modal {
+        padding: 40px 30px;
+        max-width: 380px;
+    }
+
+    .modal h2 {
+        font-size: 1.8rem;
+    }
+
+    .modal p {
+        font-size: 1.15rem;
+    }
+
+    .modal-btn {
+        padding: 16px;
+        font-size: 1.05rem;
+    }
+}
+
+/* Tablet and Medium Screens (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 16px;
+    }
+
+    .game-container {
+        max-width: 650px;
+        padding: 30px 24px;
+        gap: 2rem;
+    }
+
+    .the_wheel {
+        max-width: 380px;
+        margin-top: 20px;
+    }
+
+    #canvas {
+        max-width: 380px !important;
+        max-height: 380px !important;
+    }
+
+    .logo-img {
+        max-width: 110px;
+        padding-top: 30px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .power_controls {
+        gap: 1.4rem;
+    }
+
+    .spin-count-text {
+        font-size: 1rem;
+    }
+
+    .modal-btn {
+        padding: 14px;
+        font-size: 1rem;
+        min-height: 44px;
+    }
+}
+
+/* Small Mobile Screens (max 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+        min-height: 100vh;
+    }
+
+    .header {
+        margin-bottom: 12px;
+    }
+
+    .logo-img {
+        padding-top: 30px;
+        max-width: 100px;
+        margin-bottom: 8px;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+        margin: 8px 0 3px;
+    }
+
+    p {
+        font-size: 0.85rem;
+    }
+
+    .game-container {
+        flex-direction: column-reverse;
+        max-width: 100%;
+        padding: 16px 12px 32px;
+        gap: 1rem;
+        border-radius: 14px;
+    }
+
+    .the_wheel {
+        max-width: 100%;
+        width: 100%;
+        max-width: 380px;
+        aspect-ratio: 1/1;
+        margin-top: 12px;
+    }
+
+    #canvas {
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 380px;
+    }
+
+    /* Control Panel */
+    .power_controls {
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .power-level {
+        gap: 8px;
+    }
+
+    .power-btn {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        min-height: 40px;
+        border-radius: 20px;
+    }
+
+    /* Spin Count */
+    .spin-count-container {
+        padding: 8px 16px;
+        margin-top: 8px;
+        border-radius: 40px;
+        border: 2px solid var(--primary-color);
+    }
+
+    .spin-count-text {
+        font-size: 0.95rem;
+        font-weight: bold;
+    }
+
+    .refresh-msg {
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+
+    /* Reset Link */
+    .reset-link {
+        font-size: 0.85rem;
+        padding: 8px 14px;
+        margin-top: 12px;
+        margin-bottom: 40px;
+        border-radius: 50px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Wheel Center Button */
+    .wheel-center {
+        width: 90px;
+        height: 90px;
+        box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
+        border: 3px solid #ffffff;
+    }
+
+    .spin-text-center {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+
+    /* Wheel Pointer */
+    .wheel-pointer {
+        width: 22px;
+        height: 50px;
+        top: -25px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        padding: 16px;
+    }
+
+    .modal {
+        padding: 24px 16px;
+        max-width: 90vw;
+        width: 100%;
+        border-radius: 16px;
+    }
+
+    .modal h2 {
+        margin-top: 0;
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+
+    .modal p {
+        font-size: 0.95rem;
+        margin: 12px 0 20px;
+        line-height: 1.4;
+    }
+
+    .modal-btn {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        font-weight: bold;
+        border-radius: 40px;
+        min-height: 44px;
+        margin-bottom: 8px;
+    }
+
+    .modal-btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Extra Small Screens (max 375px) */
+@media (max-width: 375px) {
+    .logo-img {
+        max-width: 85px;
+        padding-top: 25px;
+    }
+
+    h1 {
+        font-size: 1.1rem;
+    }
+
+    .game-container {
+        padding: 12px 10px 28px;
+    }
+
+    .the_wheel {
+        max-width: 320px;
+    }
+
+    #canvas {
+        max-width: 320px !important;
+        max-height: 320px !important;
+    }
+
+    .wheel-center {
+        width: 80px;
+        height: 80px;
+    }
+
+    .spin-text-center {
+        font-size: 9px;
+    }
+
+    .spin-count-text {
+        font-size: 0.85rem;
+    }
+
+    .modal {
+        padding: 20px 14px;
+    }
+
+    .modal h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal p {
+        font-size: 0.9rem;
+    }
+}
