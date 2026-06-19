@@ -27,7 +27,7 @@ function normalizeConfig(config) {
 }
 
 function getConfigStore() {
-  return getStore(STORE_NAME);
+  return getStore({ name: STORE_NAME, consistency: "strong" });
 }
 
 async function readConfig() {
@@ -42,8 +42,9 @@ async function readConfig() {
       return normalizeConfig(parsed);
     }
   } catch (e) {
-    console.error("Error reading config from Blobs:", e);
+    console.error("Error reading config from Blobs:", e.message || e);
   }
+  // Return default config if nothing stored yet
   return normalizeConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
 }
 
@@ -55,7 +56,7 @@ async function writeConfig(config) {
     await incrementVersion();
     return true;
   } catch (e) {
-    console.error("Error writing config to Blobs:", e);
+    console.error("Error writing config to Blobs:", e.message || e);
     return false;
   }
 }
@@ -66,6 +67,7 @@ async function getVersion() {
     const version = await store.get(VERSION_KEY);
     return version ? Number(version) : 0;
   } catch (e) {
+    console.error("Error getting version:", e.message || e);
     return 0;
   }
 }
@@ -76,7 +78,7 @@ async function incrementVersion() {
     const current = await getVersion();
     await store.set(VERSION_KEY, String(current + 1));
   } catch (e) {
-    console.error("Error incrementing version:", e);
+    console.error("Error incrementing version:", e.message || e);
   }
 }
 

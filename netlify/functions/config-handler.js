@@ -19,10 +19,11 @@ exports.handler = async (event) => {
         body: JSON.stringify(config),
       };
     } catch (e) {
+      console.error("GET /api/config error:", e.message || e);
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, message: "Failed to read config." }),
+        body: JSON.stringify({ success: false, message: "Failed to read config: " + (e.message || "Unknown error") }),
       };
     }
   }
@@ -45,7 +46,7 @@ exports.handler = async (event) => {
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ success: false, message: "Failed to write configuration." }),
+          body: JSON.stringify({ success: false, message: "Failed to write configuration to store." }),
         };
       }
 
@@ -55,10 +56,11 @@ exports.handler = async (event) => {
         body: JSON.stringify({ success: false, message: "Invalid configuration format." }),
       };
     } catch (e) {
+      console.error("POST /api/config error:", e.message || e);
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, message: "Failed to save config." }),
+        body: JSON.stringify({ success: false, message: "Failed to save config: " + (e.message || "Unknown error") }),
       };
     }
   }
