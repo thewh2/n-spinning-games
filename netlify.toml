@@ -1,11 +1,15 @@
 [build]
-  command = "echo 'No build needed'"
+  command = "npm install"
   publish = "public"
   functions = "netlify/functions"
+
+[functions]
+  included_files = ["node_modules/@netlify/blobs/**", "node_modules/@netlify/blobs/dist/**"]
 
 # Environment
 [context.production.environment]
   NODE_VERSION = "20"
+
 
 
 

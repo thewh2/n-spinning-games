@@ -1,7 +1,4 @@
-/**
- * Config store using Netlify Blobs REST API directly (no SDK).
- * This avoids all bundling/import issues with @netlify/blobs.
- */
+const { getStore } = require("@netlify/blobs");
 
 const STORE_NAME = "nchat-wheel-config";
 const CONFIG_KEY = "config";
@@ -29,78 +26,10 @@ function normalizeConfig(config) {
   };
 }
 
-// Parse the Netlify Blobs context from environment
-function getBlobsContext() {
-  const raw = process.env.NETLIFY_BLOBS_CONTEXT;
-  if (!raw) {
-    throw new Error("NETLIFY_BLOBS_CONTEXT env var not set — Blobs not available");
-  }
-  try {
-    return JSON.parse(raw);
-  } catch (e) {
-    // Try base64 decode
-    return JSON.parse(Buffer.from(raw, "base64").toString("utf-8"));
-  }
-}
-
-// Build the Blobs API URL and headers
-function getBlobsRequest(key) {
-  const ctx = getBlobsContext();
-
-  // Netlify Blobs context has different formats depending on the version
-  const baseURL = ctx.uncachedEdgeURL || ctx.edgeURL || ctx.apiURL;
-  const siteID = ctx.siteID;
-  const token = ctx.token;
-  const deployID = ctx.deployID;
-
-  if (!baseURL || !token) {
-    throw new Error(`Invalid blobs context. Keys: ${Object.keys(ctx).join(", ")}`);
-  }
-
-  // The URL format for site-level stores
-  let url;
-  if (ctx.edgeURL || ctx.uncachedEdgeURL) {
-    url = `${baseURL}/${siteID}/site:${STORE_NAME}/${key}`;
-  } else {
-    // API URL format
-    url = `${baseURL}/api/v1/blobs/${siteID}/site:${STORE_NAME}/${key}`;
-  }
-
-  return {
-    url,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-}
-
-async function getBlob(key) {
-  const { url, headers } = getBlobsRequest(key);
-  const res = await fetch(url, { headers });
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Blob GET failed (${res.status}): ${text}`);
-  }
-  return res.text();
-}
-
-async function setBlob(key, value) {
-  const { url, headers } = getBlobsRequest(key);
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: { ...headers, "Content-Type": "application/octet-stream" },
-    body: value,
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Blob PUT failed (${res.status}): ${text}`);
-  }
-}
-
 async function readConfig() {
   try {
-    const data = await getBlob(CONFIG_KEY);
+    const store = getStore(STORE_NAME);
+    const data = await store.get(CONFIG_KEY);
     if (data) {
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed)) {
@@ -110,24 +39,27 @@ async function readConfig() {
     }
   } catch (e) {
     console.error("Error reading config:", e.message || e);
+    throw e;
   }
   return normalizeConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
 }
 
 async function writeConfig(config) {
   try {
-    await setBlob(CONFIG_KEY, JSON.stringify(config));
+    const store = getStore(STORE_NAME);
+    await store.set(CONFIG_KEY, JSON.stringify(config));
     await incrementVersion();
     return true;
   } catch (e) {
     console.error("Error writing config:", e.message || e);
-    throw e; // Re-throw so the handler can include the error message
+    throw e;
   }
 }
 
 async function getVersion() {
   try {
-    const version = await getBlob(VERSION_KEY);
+    const store = getStore(STORE_NAME);
+    const version = await store.get(VERSION_KEY);
     return version ? Number(version) : 0;
   } catch (e) {
     console.error("Error getting version:", e.message || e);
@@ -137,14 +69,14 @@ async function getVersion() {
 
 async function incrementVersion() {
   try {
+    const store = getStore(STORE_NAME);
     const current = await getVersion();
-    await setBlob(VERSION_KEY, String(current + 1));
+    await store.set(VERSION_KEY, String(current + 1));
   } catch (e) {
     console.error("Error incrementing version:", e.message || e);
   }
 }
 
-// Standard CORS + no-cache headers for all API responses
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
