@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Your Reward! 🎁</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(160deg, #ffffff 0%, #21cfafa5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .logo-img {
+            max-width: 180px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            animation: fadeInDown 0.8s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #11998e;
+            background: #e0f2f1;
+            border: 1px solid #11998e;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #1a5c53;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: none;
+            animation: fadeInDown 1s ease;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            opacity: 1;
+            animation: fadeInUp 1s ease;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: linear-gradient(170deg, #ffffff 0%, #e5fff1a4 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            /* Soft shadow */
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #333;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .info-box h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .scratch-card-wrapper {
+            position: relative;
+            display: inline-block;
+            border-radius: 20px;
+            padding: 0;
+            background: transparent;
+            animation: scaleIn 0.8s ease 0.4s both;
+            margin: 0 auto;
+            width: 450px;
+        }
+
+        .card-title {
+            color: #1a5c53;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: none;
+        }
+
+        .scratch-card {
+            position: relative;
+            width: 450px;
+            height: 320px;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .scratch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+        }
+
+        .scratch-card:active {
+            cursor: grabbing;
+        }
+
+        .prize-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .prize-badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transform: translateY(-10px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 1;
+        }
+
+        .prize-icon {
+            font-size: 5em;
+            margin-bottom: 15px;
+            transform: scale(1);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+            opacity: 1;
+        }
+
+        .prize-text {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+            margin-bottom: 10px;
+            opacity: 1;
+        }
+
+        .prize-amount {
+            font-size: 3.5em;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+            transform: translateY(0);
+            letter-spacing: 2px;
+            opacity: 1;
+        }
+
+        .prize-subtitle {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        #scratchCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: inherit;
+        }
+
+        .reset-btn {
+            margin-top: 30px;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .reset-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .instruction {
+            color: #fff;
+            font-size: 1.1em;
+            margin-top: 25px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            display: none;
+            font-weight: 500;
+            animation: pulse 2s ease infinite;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .instruction.won {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            font-weight: 700;
+            font-size: 1.2em;
+            border: 3px solid #FFD700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+            animation: pulse 1s ease infinite;
+            display: inline-block;
+        }
+
+        .instruction .icon {
+            display: inline-block;
+            animation: bounce 1.5s ease infinite;
+            margin-left: 5px;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        /* Win Screen Overlay */
+        .win-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 20px;
+        }
+
+        .win-screen.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .win-content {
+            text-align: center;
+            background: #b6f1e2;
+            padding: 60px 80px;
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            transform: scale(0.5) rotate(-10deg);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .win-screen.show .win-content {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+
+        .win-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeInDown 0.8s ease 0.5s both;
+        }
+
+        .win-content .big-icon {
+            font-size: 8em;
+            margin-bottom: 20px;
+            animation: winIconSpin 1s ease-out 0.5s both;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+        }
+
+        .win-content .win-title {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease 0.6s both;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .win-content .win-prize {
+            font-size: 5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: prizeGlow 1.5s ease infinite, fadeInUp 0.8s ease 0.7s both;
+            letter-spacing: 3px;
+            text-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .win-content .win-message {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            color: #666;
+            font-weight: 500;
+            animation: fadeInUp 0.8s ease 0.8s both;
+        }
+
+        .win-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.9s both;
+        }
+
+        .win-content .claim-btn {
+            padding: 18px 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .win-content .claim-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(17, 153, 142, 0.6);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .win-content .claim-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .win-content .new-card-btn {
+            padding: 18px 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #ecf5ff;
+            background: #32C91C;
+            border: 3px solid #11998e;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .win-content .new-card-btn:hover {
+            background: #11998e;
+            color: #fff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .win-content .new-card-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .progress-hint {
+            color: #fff;
+            font-size: 0.95em;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: rgba(17, 153, 142, 0.1);
+            color: #11998e;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-hint.show {
+            opacity: 1;
+        }
+
+        /* Daily Limit UI Styles */
+        .limit-banner {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            padding: 10px 25px;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid #11998e;
+            animation: fadeInDown 0.8s ease 0.3s both;
+        }
+
+        .limit-text {
+            font-weight: 700;
+            color: #1a5c53;
+            font-size: 1.1em;
+        }
+
+        .limit-count {
+            background: #11998e;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 1.2em;
+        }
+
+        .limit-reached {
+            border-color: #ff6b6b;
+        }
+
+        .limit-reached .limit-text {
+            color: #d63031;
+        }
+
+        .limit-reached .limit-count {
+            background: #ff7675;
+        }
+
+        .overlay-limit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .overlay-limit.show {
+            display: flex;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .overlay-limit h2 {
+            color: #d63031;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .overlay-limit p {
+            color: #636e72;
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes winIconSpin {
+            0% {
+                transform: scale(0) rotate(-360deg);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.2) rotate(20deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes textGlow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+
+            50% {
+                text-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        @keyframes prizeGlow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.4));
+            }
+
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 5px 25px rgba(255, 215, 0, 0.7));
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes prizeReveal {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.15) rotate(-10deg);
+            }
+
+            50% {
+                transform: scale(1.15) rotate(10deg);
+            }
+
+            75% {
+                transform: scale(1.15) rotate(-5deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes textReveal {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px) rotate(-5deg);
+            }
+
+            75% {
+                transform: translateX(10px) rotate(5deg);
+            }
+        }
+
+        /* Claim Popup Styles */
+        .claim-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .claim-popup-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .claim-popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.7);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 4px solid #38ef7d;
+        }
+
+        .claim-popup-overlay.show .claim-popup-content {
+            transform: scale(1);
+        }
+
+        .claim-popup-icon {
+            font-size: 6em;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        .claim-popup-title {
+            font-size: 2em;
+            font-weight: 800;
+            color: #11998e;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .claim-popup-prize {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #f1f1f1;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .claim-popup-instruction {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #eafff5;
+            border-radius: 15px;
+            border-left: 5px solid #38ef7d;
+        }
+
+        .claim-popup-close {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+            text-transform: uppercase;
+        }
+
+        .claim-popup-close:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .revealed .prize-badge {
+            animation: bounce 0.6s ease 0.3s;
+        }
+
+        .revealed .prize-icon {
+            animation: prizeReveal 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .revealed .prize-text {
+            animation: shake 0.5s ease 0.3s;
+        }
+
+        .revealed .prize-amount {
+            animation: prizeGlow 1.5s ease infinite;
+        }
+
+        .revealed .prize-subtitle {
+            animation: pulse 2s ease infinite;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .info-box {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .info-box h3 {
+                font-size: 1.1em;
+            }
+
+            .scratch-card-wrapper {
+                padding: 0;
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .scratch-card {
+                width: 100%;
+                height: 280px;
+            }
+
+            .prize-icon {
+                font-size: 3.5em;
+            }
+
+            .prize-text {
+                font-size: 1.6em;
+            }
+
+            .prize-amount {
+                font-size: 2.5em;
+            }
+
+            .prize-subtitle {
+                font-size: 0.9em;
+            }
+
+            .instruction {
+                font-size: 0.95em;
+                padding: 10px 20px;
+            }
+
+            .reset-btn {
+                padding: 15px 40px;
+                font-size: 1em;
+            }
+
+            /* Win screen mobile styles */
+            .win-content {
+                padding: 40px 30px;
+            }
+
+            .win-content .big-icon {
+                font-size: 5em;
+            }
+
+            .win-content .win-title {
+                font-size: 2em;
+            }
+
+            .win-content .win-prize {
+                font-size: 3.5em;
+            }
+
+            .win-content .win-message {
+                font-size: 1.1em;
+            }
+
+            .win-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .win-content .claim-btn,
+            .win-content .new-card-btn {
+                padding: 15px 40px;
+                font-size: 1.1em;
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        /* Previous styles... */
+        .scratch-particle {
+            position: absolute;
+            background: #d4d4d4;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFade 0.6s ease-out forwards;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        @keyframes particleFade {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .save-btn {
+            padding: 18px 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #f1fff3;
+            background: #2db42e;
+            border: 2px solid #007809;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .save-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-5px);
+        }
+
+        /* Generated Ticket Styles */
+        #ticketTemplate {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 400px;
+            background: #fff;
+            border: 8px solid #38ef7d;
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            color: #333;
+            z-index: 9999;
+            /* Ensure it's on top if it were visible */
+        }
+
+        #ticketTemplate .ticket-header {
+            margin-bottom: 20px;
+        }
+
+        #ticketTemplate .ticket-logo {
+            max-width: 120px;
+            margin-bottom: 10px;
+        }
+
+        #ticketTemplate h2 {
+            color: #11998e;
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        #ticketTemplate .ticket-divider {
+            border-top: 2px dashed #ccc;
+            margin: 25px 0;
+            width: 100%;
+        }
+
+        #ticketTemplate .ticket-prize {
+            margin: 20px 0;
+        }
+
+        #ticketTemplate .prize-name {
+            font-size: 36px;
+            font-weight: 900;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        #ticketTemplate .prize-icon {
+            font-size: 48px;
+            display: inline-block;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        #ticketTemplate .ticket-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        #ticketTemplate .ticket-footer {
+            color: #999;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="nchat-logo.png" alt="NChat Logo" class="logo-img" id="logoPlaceholder">
+            <div class="badge">🚀 SPECIAL REWARD 🚀</div>
+        </div>
+        <h1>🎁 Claim Your Gift!</h1>
+        <p class="subtitle">Scratch below to reveal a special reward</p>
+
+        <div class="limit-banner" id="limitBanner">
+            <span class="limit-text" id="limitStatus">Scratches Left:</span>
+            <span class="limit-count" id="remainingSpins">3</span>
+        </div>
+
+
+
+        <div class="scratch-card-wrapper">
+            <div class="card-title">🎟️ YOUR SCRATCH CARD</div>
+            <div class="scratch-card" id="scratchCard">
+                <div class="prize-container" id="prizeContainer">
+                    <div class="prize-badge" id="prizeBadge">Congratulations!</div>
+                    <div class="prize-icon" id="prizeIcon">🎁</div>
+                    <div class="prize-text" id="prizeText">YOU WON</div>
+                    <div class="prize-amount" id="prizeAmount">???</div>
+                    <div class="prize-subtitle" id="prizeSubtitle">Claim your reward now!</div>
+                </div>
+                <canvas id="scratchCanvas"></canvas>
+                <div class="overlay-limit" id="overlayLimit">
+                    <div class="big-icon">⏳</div>
+                    <h2>OUT OF SCRATCHES</h2>
+                    <p>You have used your daily limit of 3 scratches. Please come back tomorrow for more chances!</p>
+                    <div class="badge" style="background: #ffeaa7; border-color: #fdcb6e; color: #d35400;">REFRESHES
+                        TOMORROW</div>
+                </div>
+            </div>
+            <p class="instruction" id="instruction"></p>
+            <div class="progress-hint" id="progressHint">Keep going! You're doing great!</div>
+        </div>
+
+        <button class="reset-btn" id="resetBtn">🔄 Try Another Card</button>
+    </div>
+
+    <!-- Win Screen Overlay -->
+    <div class="win-screen" id="winScreen">
+        <div class="win-content">
+            <img src="nchat-logo.png" alt="NChat Logo" class="logo-img" style="max-width: 120px; margin-bottom: 10px;">
+            <br>
+            <div class="win-badge">🏆 WINNER 🏆</div>
+            <div class="big-icon" id="winIcon">🎉</div>
+            <div class="win-title" id="winTitle">CONGRATULATIONS!</div>
+            <div class="win-prize" id="winPrize">PRIZE</div>
+            <div class="win-message" id="winMessage">You've won an amazing prize!</div>
+            <div class="win-buttons">
+                <button class="claim-btn" id="claimBtn">🎁 Claim Reward</button>
+                <!-- <button class="save-btn" id="saveBtn">📸 Save Ticket</button> -->
+                <button class="new-card-btn" id="newCardBtn">🔄 Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Ticket Template for Generation -->
+    <div id="ticketTemplate">
+        <div class="ticket-header">
+            <img src="nchat-logo.png" alt="NChat" class="ticket-logo">
+            <h2>WINNER TICKET</h2>
+        </div>
+        <div class="ticket-divider"></div>
+        <div class="ticket-prize">
+            <div class="prize-name">
+                <span id="ticketPrizeName">Notebook</span>
+                <span id="ticketPrizeIcon" class="prize-icon">📓</span>
+            </div>
+        </div>
+        <div class="ticket-meta">
+            <div id="ticketTimestamp">Issued: 12/12/2025, 10:00 AM</div>
+        </div>
+        <div class="ticket-footer">
+            Present this ticket at the desk.
+        </div>
+    </div>
+
+    <!-- Claim Success Popup -->
+    <div class="claim-popup-overlay" id="claimPopup">
+        <div class="claim-popup-content">
+            <span class="claim-popup-icon" id="claimPopupIcon">🎁</span>
+            <h2 class="claim-popup-title">REWARD CLAIMED!</h2>
+            <div class="claim-popup-prize" id="claimPopupPrize">GURKHA WALLET</div>
+            <div class="claim-popup-instruction">
+                <strong>Show this message at the desk</strong> to claim your gift! Congratulations on your amazing win!
+            </div>
+            <button class="claim-popup-close" id="closeClaimPopup">AWESOME!</button>
+        </div>
+    </div>
+
+    <script>
+        // ── API-driven config (shared with spin game) ──
+        const PRIZE_COLORS = [
+            'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)',
+            'linear-gradient(135deg, #2c3e50 0%, #000000 100%)',
+            'linear-gradient(135deg, #f9ca24 0%, #f0932b 100%)',
+            'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)',
+            'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+            'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)',
+            'linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%)',
+        ];
+
+        let winningPrizes = [];
+        let serverConfig = null;
+        let lastScratchConfigVersion = null;
+        let scratchConfigPollTimer = null;
+
+        const tryAgainPrize = {
+            icon: '🤞',
+            text: 'TRY AGAIN',
+            amount: 'No Gifts',
+            subtitle: 'Better luck next time!',
+            color: 'linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%)',
+            isTryAgain: true
+        };
+
+        // Fetch config from API and build prize list
+        async function loadScratchConfig() {
+            try {
+                const res = await fetch('/api/config?t=' + Date.now());
+                if (res.ok) {
+                    serverConfig = await res.json();
+                    const prizes = (serverConfig.prizes || []).filter(p => p.enabled && p.stock > 0);
+                    winningPrizes = prizes.map((p, i) => ({
+                        id: p.id,
+                        icon: p.icon || '🎁',
+                        text: p.name.toUpperCase(),
+                        amount: '1 Pc',
+                        subtitle: p.subtitle || 'Claim your reward!',
+                        color: PRIZE_COLORS[i % PRIZE_COLORS.length],
+                        probability: p.probability || 5,
+                        isTryAgain: false
+                    }));
+                    DailyLimit.MAX_SCRATCHES = serverConfig.maxSpinsPerDay || 3;
+                    DailyLimit.updateUI();
+                }
+            } catch (e) {
+                console.warn('Failed to load config from API', e);
+            }
+        }
+
+        // Poll for config version changes (instant sync from admin)
+        async function checkScratchConfigVersion() {
+            try {
+                const res = await fetch('/api/config/version?t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    const v = Number(data.version || 0);
+                    if (lastScratchConfigVersion === null) {
+                        lastScratchConfigVersion = v;
+                        return;
+                    }
+                    if (v !== lastScratchConfigVersion) {
+                        lastScratchConfigVersion = v;
+                        await loadScratchConfig();
+                        console.log('🔄 Scratch config updated from admin');
+                    }
+                }
+            } catch (e) { /* silent */ }
+        }
+
+        function startScratchConfigSync() {
+            scratchConfigPollTimer = setInterval(checkScratchConfigVersion, 1500);
+        }
+
+        // Decrement stock on win
+        async function decrementScratchStock(prize) {
+            try {
+                await fetch('/api/config/decrement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemId: prize.id, itemName: prize.text })
+                });
+            } catch (e) {
+                console.warn('Stock decrement failed', e);
+            }
+        }
+
+        // Canvas setup
+        const canvas = document.getElementById('scratchCanvas');
+        const ctx = canvas.getContext('2d');
+        const prizeContainer = document.getElementById('prizeContainer');
+        const resetBtn = document.getElementById('resetBtn');
+        const instruction = document.getElementById('instruction');
+        const progressHint = document.getElementById('progressHint');
+        const winScreen = document.getElementById('winScreen');
+        const claimBtn = document.getElementById('claimBtn');
+        const newCardBtn = document.getElementById('newCardBtn');
+
+        let isScratching = false;
+        let isRevealed = false;
+        let scratchedPercentage = 0;
+        let hasStartedScratching = false;
+        let currentPrize = null;
+
+        // Haptic Feedback Manager
+        const HapticManager = {
+            canVibrate: 'vibrate' in navigator,
+            lastVibrate: 0,
+
+            trigger() {
+                if (this.canVibrate) {
+                    const now = Date.now();
+                    // Limit vibration frequency to avoid overwhelming
+                    if (now - this.lastVibrate > 50) {
+                        navigator.vibrate(10); // Short bump
+                        this.lastVibrate = now;
+                    }
+                }
+            }
+        };
+
+        // Daily Limit Logic
+        const DailyLimit = {
+            MAX_SCRATCHES: 3, // Updated from API
+            STORAGE_KEY: '_nchat_game_state_v1', // Obfuscated key
+
+            getState() {
+                const saved = localStorage.getItem(this.STORAGE_KEY);
+                const today = new Date().toISOString().split('T')[0];
+
+                if (saved) {
+                    try {
+                        const state = JSON.parse(saved);
+                        if (state.date === today) {
+                            return state;
+                        }
+                    } catch (e) {
+                        console.error('State corruption', e);
+                    }
+                }
+
+                // Initial state for new day
+                return {
+                    date: today,
+                    scratches: 0
+                };
+            },
+
+            saveState(scratches) {
+                const today = new Date().toISOString().split('T')[0];
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
+                    date: today,
+                    scratches: scratches
+                }));
+            },
+
+            getRemaining() {
+                const state = this.getState();
+                return Math.max(0, this.MAX_SCRATCHES - state.scratches);
+            },
+
+            useScratch() {
+                const state = this.getState();
+                if (state.scratches < this.MAX_SCRATCHES) {
+                    state.scratches++;
+                    this.saveState(state.scratches);
+                    this.updateUI();
+                    return true;
+                }
+                return false;
+            },
+
+            canScratch() {
+                return this.getRemaining() > 0;
+            },
+
+            updateUI() {
+                const remaining = this.getRemaining();
+                const countEl = document.getElementById('remainingSpins'); // Keep ID same for simplicity or change if desired
+                const banner = document.getElementById('limitBanner');
+                const statusText = document.getElementById('limitStatus');
+                const overlay = document.getElementById('overlayLimit');
+                const resetBtn = document.getElementById('resetBtn');
+
+                if (remaining <= 0) {
+                    banner.classList.add('limit-reached');
+                    statusText.textContent = 'scratches refresh on tomorrow';
+                    countEl.style.display = 'none';
+                    overlay.classList.add('show');
+                    resetBtn.style.display = 'none';
+                } else {
+                    banner.classList.remove('limit-reached');
+                    statusText.textContent = remaining + ' scratches left';
+                    countEl.style.display = 'none';
+                    overlay.classList.remove('show');
+                    resetBtn.style.display = 'inline-block';
+                }
+            }
+        };
+
+        // Particle System
+        const ParticleManager = {
+            spawn(x, y) {
+                // Adjust coordinates relative to wrapper because particle container is needed or append to body with offset
+                // Simplest: append to body and calculate absolute position
+                const rect = canvas.getBoundingClientRect();
+                const globalX = rect.left + x;
+                const globalY = rect.top + y;
+
+                const particle = document.createElement('div');
+                particle.className = 'scratch-particle';
+
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+
+                particle.style.left = globalX + 'px';
+                particle.style.top = globalY + 'px';
+
+                // Random destination
+                const tx = (Math.random() - 0.5) * 60;
+                const ty = Math.random() * 60 + 20; // Fall down
+
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+
+                document.body.appendChild(particle);
+
+                // Cleanup
+                setTimeout(() => particle.remove(), 600);
+            }
+        };
+
+        // Sound Manager (Web Audio API)
+        const SoundManager = {
+            ctx: null,
+            gainNode: null,
+            filter: null,
+            filterHP: null,
+            noiseSource: null,
+            isPlaying: false,
+            initDone: false,
+            stopTimeout: null,
+            lastSpeed: 0,
+
+            init() {
+                if (this.initDone) return;
+
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return;
+
+                    this.ctx = new AudioContext();
+                    this.buildGraph();
+                    this.initDone = true;
+                } catch (e) {
+                    console.error('AudioContext not supported');
+                }
+            },
+
+            resume() {
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            buildGraph() {
+                // Create 2 seconds of white noise
+                const bufferSize = this.ctx.sampleRate * 2;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                // Create source
+                this.noiseSource = this.ctx.createBufferSource();
+                this.noiseSource.buffer = buffer;
+                this.noiseSource.loop = true;
+
+                // Highpass filter to remove low-end rumble (makes it sound 'papyery')
+                this.filterHP = this.ctx.createBiquadFilter();
+                this.filterHP.type = 'highpass';
+                this.filterHP.frequency.value = 1500;
+                this.filterHP.Q.value = 0.7;
+
+                // Bandpass filter to focus on the 'scratch' frequencies
+                this.filter = this.ctx.createBiquadFilter();
+                this.filter.type = 'bandpass';
+                this.filter.frequency.value = 4000;
+                this.filter.Q.value = 1.0;
+
+                // Create gain node (volume)
+                this.gainNode = this.ctx.createGain();
+                this.gainNode.gain.value = 0;
+
+                // Connect: Noise -> HP -> Bandpass -> Gain -> Destination
+                this.noiseSource.connect(this.filterHP);
+                this.filterHP.connect(this.filter);
+                this.filter.connect(this.gainNode);
+                this.gainNode.connect(this.ctx.destination);
+
+                // Start source
+                this.noiseSource.start();
+            },
+
+            play(speed = 0) {
+                if (!this.initDone || !this.ctx) return;
+
+                this.resume();
+
+                // Cancel any pending stop
+                if (this.stopTimeout) {
+                    clearTimeout(this.stopTimeout);
+                    this.stopTimeout = null;
+                }
+
+                // Modulation: Faster scratching = Higher frequency & Slightly louder
+                // speed is typically between 0 and 50 per frame
+                const normalizedSpeed = Math.min(speed / 40, 1);
+                const targetFreq = 2000 + (normalizedSpeed * 6000); // 2kHz to 8kHz
+                const targetGain = 0.05 + (normalizedSpeed * 0.15); // 0.05 to 0.2
+
+                // Smoothly transition filter and gain
+                this.filter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.05);
+
+                // Add some 'jitter' to the gain for texture
+                const jitter = (Math.random() - 0.5) * 0.05;
+                this.gainNode.gain.cancelScheduledValues(this.ctx.currentTime);
+                this.gainNode.gain.setTargetAtTime(targetGain + jitter, this.ctx.currentTime, 0.02);
+
+                // Auto-stop after short delay if no more movement
+                this.stopTimeout = setTimeout(() => {
+                    this.stop();
+                }, 100);
+            },
+
+            stop() {
+                if (!this.initDone || !this.gainNode) return;
+
+                // Fade out quickly
+                this.gainNode.gain.cancelScheduledValues(this.ctx.currentTime);
+                this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
+            }
+        };
+
+        // Set canvas size
+        function resizeCanvas() {
+            const card = document.getElementById('scratchCard');
+            canvas.width = card.offsetWidth;
+            canvas.height = card.offsetHeight;
+            drawScratchLayer();
+        }
+
+        // Draw scratch layer
+        function drawScratchLayer() {
+            // Metallic silver gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#d4d4d4');
+            gradient.addColorStop(0.25, '#f0f0f0');
+            gradient.addColorStop(0.5, '#c0c0c0');
+            gradient.addColorStop(0.75, '#f0f0f0');
+            gradient.addColorStop(1, '#d4d4d4');
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add shiny effect
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+
+            // Main text
+            ctx.fillStyle = '#888';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('SCRATCH HERE', canvas.width / 2, canvas.height / 2 - 30);
+
+            // Icon
+            ctx.font = '40px Arial';
+            ctx.fillText('🎁', canvas.width / 2, canvas.height / 2 + 10);
+
+            // Instruction
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#999';
+            ctx.fillText('TO REVEAL YOUR REWARD', canvas.width / 2, canvas.height / 2 + 50);
+        }
+
+        // Scratch effect
+        let lastX = null;
+        let lastY = null;
+
+        function scratch(x, y) {
+            if (!hasStartedScratching) {
+                hasStartedScratching = true;
+                progressHint.classList.add('show');
+            }
+
+            // Calculate scratch speed for more natural sound
+            let speed = 0;
+            if (lastX !== null && lastY !== null) {
+                speed = Math.sqrt(Math.pow(x - lastX, 2) + Math.pow(y - lastY, 2));
+            }
+            lastX = x;
+            lastY = y;
+
+            // Play sound with speed-based modulation
+            SoundManager.play(speed);
+
+            // Trigger Haptics
+            HapticManager.trigger();
+
+            // Spawn particles (limit frequency slightly if needed, but doing it on every move is usually okay for visuals)
+            if (Math.random() > 0.5) { // Spawn on 50% of move events to save DOM perf
+                ParticleManager.spawn(x, y);
+            }
+
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Calculate scratched percentage
+        function calculateScratchedPercentage() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparent = 0;
+
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] === 0) {
+                    transparent++;
+                }
+            }
+
+            return (transparent / (pixels.length / 4)) * 100;
+        }
+
+        // Get coordinates
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        // Mouse/Touch events
+        canvas.addEventListener('mousedown', startScratching);
+        canvas.addEventListener('mousemove', continueScratchingMouse);
+        canvas.addEventListener('mouseup', stopScratching);
+        canvas.addEventListener('mouseleave', stopScratching);
+
+        canvas.addEventListener('touchstart', startScratching);
+        canvas.addEventListener('touchmove', continueScratchingTouch);
+        canvas.addEventListener('touchend', stopScratching);
+
+        function startScratching(e) {
+            e.preventDefault();
+
+            // Check daily limit before starting
+            if (!DailyLimit.canScratch()) {
+                DailyLimit.updateUI();
+                return;
+            }
+
+            SoundManager.init(); // Try to init on first touch/click
+            SoundManager.resume();
+
+            isScratching = true;
+            const coords = getCoordinates(e);
+            scratch(coords.x, coords.y);
+        }
+
+        function continueScratchingMouse(e) {
+            if (isScratching && !isRevealed) {
+                const coords = getCoordinates(e);
+                scratch(coords.x, coords.y);
+                checkReveal();
+            }
+        }
+
+        function continueScratchingTouch(e) {
+            e.preventDefault();
+            if (isScratching && !isRevealed) {
+                const coords = getCoordinates(e);
+                scratch(coords.x, coords.y);
+                checkReveal();
+            }
+        }
+
+        function stopScratching() {
+            isScratching = false;
+            SoundManager.stop();
+            lastX = null;
+            lastY = null;
+        }
+
+        // Check if enough is scratched
+        function checkReveal() {
+            scratchedPercentage = calculateScratchedPercentage();
+
+            // Show prize hint as scratching progresses
+            if (scratchedPercentage > 15 && scratchedPercentage < 30) {
+                progressHint.textContent = 'You can see something! Keep going!';
+            } else if (scratchedPercentage > 30 && scratchedPercentage < 50) {
+                progressHint.textContent = 'Almost there! Keep scratching!';
+            }
+
+            if (scratchedPercentage > 50 && !isRevealed) {
+                revealPrize();
+            }
+        }
+
+        // Reveal prize with animation
+        function revealPrize() {
+            if (isRevealed) return;
+
+            // Actually use the scratch only when revealed
+            if (!DailyLimit.useScratch()) {
+                DailyLimit.updateUI();
+                return;
+            }
+
+            isRevealed = true;
+
+            // Decrement stock on server if it's a winning prize
+            if (currentPrize && !currentPrize.isTryAgain) {
+                decrementScratchStock(currentPrize);
+            }
+
+            // Hide progress hint
+            progressHint.classList.remove('show');
+
+            // Clear canvas with animation
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.1;
+                ctx.globalAlpha = opacity;
+
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.style.pointerEvents = 'none';
+                }
+            }, 30);
+
+            // Trigger prize animation in card first
+            setTimeout(() => {
+                prizeContainer.classList.add('revealed');
+
+                if (currentPrize.isTryAgain) {
+                    instruction.classList.add('won'); // Use same style for visibility, but change color manually if needed
+                    instruction.style.background = 'linear-gradient(135deg, #95a5a6, #7f8c8d)';
+                    instruction.innerHTML = '💪 Don\'t give up! Try again! 💪';
+                    // No confetti for try again
+                } else {
+                    instruction.classList.add('won');
+                    instruction.style.background = ''; // Reset to default
+                    instruction.innerHTML = '🎉 Congratulations! You Won! 🎉';
+                    createConfetti();
+                }
+
+                playWinAnimation();
+            }, 300);
+
+            // Show win screen after delay
+            setTimeout(() => {
+                showWinScreen();
+            }, 2000);
+        }
+
+        // Win animation
+        function playWinAnimation() {
+            const card = document.getElementById('scratchCard');
+            card.style.animation = 'shake 0.6s ease';
+
+            // Play success sound (you can add actual sound here)
+            setTimeout(() => {
+                card.style.animation = '';
+                card.style.transform = 'scale(1.05)';
+                card.style.boxShadow = '0 20px 60px rgba(17, 153, 142, 0.5)';
+            }, 600);
+        }
+
+        // Show win screen
+        function showWinScreen() {
+            // Set win screen content
+            document.getElementById('winIcon').textContent = currentPrize.icon;
+            document.getElementById('winTitle').textContent = currentPrize.text;
+            document.getElementById('winPrize').textContent = currentPrize.amount;
+            document.getElementById('winMessage').textContent = currentPrize.subtitle;
+
+            const winBadge = document.querySelector('.win-badge');
+
+            // Handle button visibility based on prize type
+            /* const saveBtn = document.getElementById('saveBtn'); */
+
+            if (currentPrize.isTryAgain) {
+                claimBtn.style.display = 'none';
+                /* saveBtn.style.display = 'none'; // Don't save "Try Again" */
+                newCardBtn.textContent = '🔄 Try Again';
+                winBadge.textContent = '💪 ALMOST THERE';
+                // Customize title color for sad moment
+                document.getElementById('winTitle').style.webkitTextFillColor = '#7f8c8d';
+                document.getElementById('winPrize').style.webkitTextFillColor = '#95a5a6';
+
+                // Check if they have more scratches
+                if (!DailyLimit.canScratch()) {
+                    newCardBtn.style.display = 'none';
+                    const msg = document.querySelector('.win-message');
+                    msg.innerHTML = "You've used all your scratches for today!<br><strong>Refresh on tomorrow</strong>";
+                }
+            } else {
+                claimBtn.style.display = 'flex'; // Restore if hidden
+                /* saveBtn.style.display = 'flex'; // Show for winners */
+                newCardBtn.textContent = '🔄 Play Again';
+                winBadge.textContent = '🏆 WINNER 🏆';
+                // Restore happy colors
+                document.getElementById('winTitle').style.webkitTextFillColor = 'transparent';
+                document.getElementById('winPrize').style.webkitTextFillColor = 'transparent';
+
+                // Check if they have more scratches
+                if (!DailyLimit.canScratch()) {
+                    newCardBtn.style.display = 'none';
+                }
+
+                // More confetti for win screen ONLY if it's a win
+                setTimeout(() => {
+                    createConfetti();
+                }, 500);
+            }
+
+            // Show win screen
+            winScreen.classList.add('show');
+
+        }
+
+        // Close win screen
+        function closeWinScreen() {
+            winScreen.classList.remove('show');
+        }
+
+        // Create confetti
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493', '#7fff00', '#ff69b4'];
+
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 15);
+            }
+        }
+
+        // Set random prize using API config probabilities
+        function setRandomPrize() {
+            if (!winningPrizes || winningPrizes.length === 0) {
+                // No prizes available, always try again
+                currentPrize = { ...tryAgainPrize };
+            } else {
+                // Calculate total prize probability
+                const totalPrizeProb = winningPrizes.reduce((sum, p) => sum + (p.probability || 0), 0);
+                const tryAgainProb = Math.max(0, 100 - totalPrizeProb);
+                const r = Math.random() * 100;
+
+                let cumulative = 0;
+                let chosen = null;
+                for (const prize of winningPrizes) {
+                    cumulative += (prize.probability || 0);
+                    if (r < cumulative) {
+                        chosen = prize;
+                        break;
+                    }
+                }
+
+                if (chosen) {
+                    currentPrize = { ...chosen, isTryAgain: false };
+                } else {
+                    currentPrize = { ...tryAgainPrize };
+                }
+            }
+
+            document.getElementById('prizeIcon').textContent = currentPrize.icon;
+            document.getElementById('prizeText').textContent = currentPrize.text;
+            document.getElementById('prizeAmount').textContent = currentPrize.amount;
+            document.getElementById('prizeSubtitle').textContent = currentPrize.subtitle;
+            document.getElementById('prizeBadge').textContent = currentPrize.isTryAgain ? 'Good Try!' : 'Congratulations!';
+            prizeContainer.style.background = currentPrize.color;
+        }
+
+        // Reset game
+        function resetGame() {
+            // If the user started scratching but didn't finish (reveal), 
+            // deduct the chance now before resetting.
+            if (hasStartedScratching && !isRevealed) {
+                if (!DailyLimit.useScratch()) {
+                    DailyLimit.updateUI();
+                    closeWinScreen();
+                    return;
+                }
+            }
+
+            if (!DailyLimit.canScratch()) {
+                DailyLimit.updateUI();
+                closeWinScreen();
+                return;
+            }
+
+            isScratching = false;
+            isRevealed = false;
+            scratchedPercentage = 0;
+            hasStartedScratching = false;
+
+            // Close win screen
+            closeWinScreen();
+
+            prizeContainer.classList.remove('revealed');
+            canvas.style.pointerEvents = 'auto';
+            instruction.classList.remove('won');
+            instruction.innerHTML = '';
+
+            // Ensure sound stops
+            SoundManager.stop();
+
+            progressHint.textContent = 'Keep going! You\'re doing great!';
+            progressHint.classList.remove('show');
+
+            // Reset card style
+            const card = document.getElementById('scratchCard');
+            card.style.transform = '';
+            card.style.boxShadow = '';
+
+            ctx.globalAlpha = 1;
+            ctx.globalCompositeOperation = 'source-over';
+
+            setRandomPrize();
+            resizeCanvas();
+        }
+
+        // Event listeners
+        resetBtn.addEventListener('click', resetGame);
+        newCardBtn.addEventListener('click', resetGame);
+
+        claimBtn.addEventListener('click', () => {
+            const popup = document.getElementById('claimPopup');
+            const icon = document.getElementById('claimPopupIcon');
+            const prize = document.getElementById('claimPopupPrize');
+
+            icon.textContent = currentPrize.icon;
+            prize.textContent = currentPrize.text + ' (' + currentPrize.amount + ')';
+
+            popup.classList.add('show');
+        });
+
+        document.getElementById('closeClaimPopup').addEventListener('click', () => {
+            document.getElementById('claimPopup').classList.remove('show');
+        });
+        window.addEventListener('resize', () => {
+            if (!isRevealed) {
+                resizeCanvas();
+            }
+        });
+
+        /*
+        // Save Ticket Function
+        // Save Ticket Function
+        document.getElementById('saveBtn').addEventListener('click', function () {
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ Generating...';
+            btn.disabled = true;
+
+            // Populate Ticket Template
+            const ticketName = document.getElementById('ticketPrizeName');
+            const ticketIcon = document.getElementById('ticketPrizeIcon');
+            const ticketTime = document.getElementById('ticketTimestamp');
+
+            ticketName.textContent = currentPrize.text;
+            ticketIcon.textContent = currentPrize.icon;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString();
+            ticketTime.textContent = `Issued: ${dateStr} • ${timeStr}`;
+
+            // Wait brief moment for DOM update
+            setTimeout(() => {
+                const ticketEl = document.getElementById('ticketTemplate');
+                // Temporarily move into view for reliable capture (but invisible)
+                // Actually html2canvas works fine with off-screen fixed elements usually, 
+                // but we need to ensure images load.
+
+                html2canvas(ticketEl, {
+                    backgroundColor: null,
+                    scale: 3, // Higher quality for print
+                    useCORS: true
+                }).then(canvas => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+
+                    const link = document.createElement('a');
+                    link.download = 'NChat-Winning-Ticket.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("Screenshot failed", err);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    alert("Count not generate ticket. Please try again.");
+                });
+            }, 100);
+        });
+        */
+
+        // Initialize — load config from API then start game
+        async function initScratchGame() {
+            await loadScratchConfig();
+            DailyLimit.updateUI();
+            setRandomPrize();
+            resizeCanvas();
+            startScratchConfigSync();
+        }
+        initScratchGame();
+    </script>
+</body>
+
+</html>
