@@ -1,4 +1,4 @@
-const { getStore } = require("@netlify/blobs");
+import { getStore } from "@netlify/blobs";
 
 const STORE_NAME = "nchat-wheel-config";
 const CONFIG_KEY = "config";
@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
   ],
 };
 
-function normalizeConfig(config) {
+export function normalizeConfig(config) {
   const safeConfig = config && typeof config === "object" ? config : { maxSpinsPerDay: 3, prizes: [] };
   const safePrizes = Array.isArray(safeConfig.prizes) ? safeConfig.prizes : [];
   return {
@@ -26,9 +26,13 @@ function normalizeConfig(config) {
   };
 }
 
-async function readConfig() {
+export function getConfigStore() {
+  return getStore(STORE_NAME);
+}
+
+export async function readConfig() {
   try {
-    const store = getStore(STORE_NAME);
+    const store = getConfigStore();
     const data = await store.get(CONFIG_KEY);
     if (data) {
       const parsed = JSON.parse(data);
@@ -44,55 +48,41 @@ async function readConfig() {
   return normalizeConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
 }
 
-async function writeConfig(config) {
-  try {
-    const store = getStore(STORE_NAME);
-    await store.set(CONFIG_KEY, JSON.stringify(config));
-    await incrementVersion();
-    return true;
-  } catch (e) {
-    console.error("Error writing config:", e.message || e);
-    throw e;
-  }
+export async function writeConfig(config) {
+  const store = getConfigStore();
+  await store.set(CONFIG_KEY, JSON.stringify(config));
+  const current = await getVersion();
+  await store.set(VERSION_KEY, String(current + 1));
 }
 
-async function getVersion() {
+export async function getVersion() {
   try {
-    const store = getStore(STORE_NAME);
+    const store = getConfigStore();
     const version = await store.get(VERSION_KEY);
     return version ? Number(version) : 0;
   } catch (e) {
-    console.error("Error getting version:", e.message || e);
     return 0;
   }
 }
 
-async function incrementVersion() {
-  try {
-    const store = getStore(STORE_NAME);
-    const current = await getVersion();
-    await store.set(VERSION_KEY, String(current + 1));
-  } catch (e) {
-    console.error("Error incrementing version:", e.message || e);
-  }
-}
-
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-    "Pragma": "no-cache",
-    "Expires": "0",
-  };
-}
-
-module.exports = {
-  DEFAULT_CONFIG,
-  normalizeConfig,
-  readConfig,
-  writeConfig,
-  getVersion,
-  corsHeaders,
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  "Pragma": "no-cache",
+  "Expires": "0",
 };
+
+export function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+  });
+}
+
+export function corsResponse() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export { DEFAULT_CONFIG };

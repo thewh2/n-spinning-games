@@ -3,41 +3,6 @@
   publish = "public"
   functions = "netlify/functions"
 
-[functions]
-  included_files = ["node_modules/@netlify/blobs/**", "node_modules/@netlify/blobs/dist/**"]
-
 # Environment
 [context.production.environment]
   NODE_VERSION = "20"
-
-
-
-
-# API Redirects - route /api/* to Netlify Functions
-[[redirects]]
-  from = "/api/config/version"
-  to = "/.netlify/functions/config-version"
-  status = 200
-
-[[redirects]]
-  from = "/api/config/decrement"
-  to = "/.netlify/functions/config-decrement"
-  status = 200
-
-[[redirects]]
-  from = "/api/admin/login"
-  to = "/.netlify/functions/admin-login"
-  status = 200
-
-# POST /api/config and GET /api/config both go to the same function
-# The function checks the HTTP method internally
-[[redirects]]
-  from = "/api/config"
-  to = "/.netlify/functions/config-handler"
-  status = 200
-
-# SPA fallback - serve index.html for unknown routes
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
