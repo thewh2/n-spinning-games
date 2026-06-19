@@ -3,10 +3,14 @@
   publish = "public"
   functions = "netlify/functions"
 
+[functions]
+  external_node_modules = ["@netlify/blobs"]
+  node_bundler = "nft"
 
 # Environment
 [context.production.environment]
   NODE_VERSION = "18"
+
 
 # API Redirects - route /api/* to Netlify Functions
 [[redirects]]
